@@ -1,0 +1,2311 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Schülerdokumentation</title>
+<meta name="theme-color" content="#4C78A8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Beobachtung">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  color:#20252b;
+  background:#f4f5f7;
+}
+*{box-sizing:border-box}
+body{margin:0}
+header{
+  background:#fff;
+  border-bottom:1px solid #ddd;
+  padding:18px 22px;
+  position:sticky;
+  top:0;
+  z-index:5;
+}
+h1{margin:0 0 5px;font-size:23px}
+h2{margin:0 0 16px}
+h3{margin:0 0 8px}
+.sub{color:#69717b;font-size:13px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+button{
+  border:1px solid #cfd4da;
+  background:#fff;
+  border-radius:8px;
+  padding:9px 12px;
+  cursor:pointer;
+  font:inherit;
+}
+button:hover{background:#f7f8f9}
+button:disabled{opacity:.55;cursor:not-allowed}
+.primary{background:#20252b;color:#fff;border-color:#20252b}
+.primary:hover{background:#343a40}
+main{padding:22px;max-width:1250px;margin:auto}
+.view{display:none}
+.view.active{display:block}
+.student-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+  gap:12px;
+}
+.student-card{
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:12px;
+  padding:16px;
+  text-align:left;
+  cursor:pointer;
+}
+.student-card:hover{border-color:#9299a1}
+.student-name{font-weight:700;font-size:17px}
+.student-meta{font-size:13px;color:#737b84;margin-top:5px}
+.empty{
+  background:#fff;
+  border:1px dashed #bbb;
+  border-radius:12px;
+  padding:30px;
+  text-align:center;
+  color:#69717b;
+}
+.detail-head{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:18px;
+}
+.detail-head h2{margin:0}
+.back{font-size:13px}
+.info{
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:16px;
+}
+.dialog-actions{
+  display:flex;
+  gap:8px;
+  margin-top:16px;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+}
+.dialog-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+label{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  color:#626a73;
+  margin-bottom:5px;
+}
+input,textarea,select{
+  width:100%;
+  padding:9px;
+  border:1px solid #cfd4da;
+  border-radius:8px;
+  font:inherit;
+}
+textarea{resize:vertical;min-height:75px}
+.builder{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.box{
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:12px;
+  background:#fafbfc;
+}
+.box h4{margin:0 0 9px}
+.checks{display:grid;gap:7px}
+.checks label{
+  font-weight:400;
+  font-size:14px;
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.checks input{width:auto}
+.selected-list{display:flex;flex-wrap:wrap;gap:6px}
+.chip{
+  padding:5px 8px;
+  border:1px solid #cdd3d9;
+  border-radius:999px;
+  background:#fff;
+  font-size:12px;
+}
+.observation{
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:12px;
+}
+.obs-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+}
+.obs-date{font-weight:700}
+.ratings{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:6px 16px;
+  margin:14px 0;
+}
+.rating-row{display:contents}
+.stars button{
+  border:0;
+  background:transparent;
+  padding:0 1px;
+  font-size:20px;
+}
+.stars{white-space:nowrap}
+.obs-text{
+  margin-top:12px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.chart-wrap{
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:12px;
+  padding:16px;
+  overflow:auto;
+}
+.chart-title{font-weight:700;margin-bottom:10px}
+.chart-scroll{overflow-x:auto}
+.chart-area{
+  position:relative;
+  height:330px;
+  border-left:1px solid #aeb5bc;
+  border-bottom:1px solid #aeb5bc;
+  margin:4px 12px 0 150px;
+  min-width:560px;
+}
+.gridline{
+  position:absolute;
+  left:0;
+  right:0;
+  border-top:1px dashed #d8dce0;
+}
+.ylabel{
+  position:absolute;
+  left:-145px;
+  width:130px;
+  text-align:right;
+  font-size:11px;
+  color:#6b737b;
+}
+.chart-point{
+  position:absolute;
+  width:12px;
+  height:12px;
+  border:2px solid #20252b;
+  border-radius:50%;
+  background:#fff;
+  transform:translate(-50%,50%);
+}
+.chart-segment{
+  position:absolute;
+  height:2px;
+  background:#20252b;
+  transform-origin:left center;
+}
+.chart-legend{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:12px;
+  font-size:12px;
+}
+.legend-item{
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+.legend-dot{
+  width:9px;
+  height:9px;
+  border-radius:50%;
+}
+.legend{font-size:12px;color:#6b737b;margin:8px 0}
+.status{font-size:12px;color:#6c747c;margin-left:auto}
+.sync-info{font-size:12px;color:#69717b;margin-top:8px}
+.sync-ok{color:#2f6f44}
+.sync-warn{color:#8a5a00}
+.sync-stat{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:6px 14px;
+}
+.sync-stat b{font-size:16px}
+.table-wrap{
+  background:#fff;
+  border:1px solid #ddd;
+  border-radius:12px;
+  overflow:auto;
+}
+table{border-collapse:collapse;width:100%;min-width:900px}
+th,td{
+  text-align:left;
+  padding:10px;
+  border-bottom:1px solid #eee;
+  vertical-align:top;
+}
+th{
+  font-size:12px;
+  color:#626a73;
+  background:#fafbfc;
+  position:sticky;
+  top:0;
+  z-index:1;
+}
+.class-badge{
+  display:inline-block;
+  padding:3px 8px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:12px;
+}
+.class-row{
+  border-left:5px solid transparent;
+}
+.small-actions{white-space:nowrap}
+.small-actions button{padding:6px 8px;font-size:12px}
+.class-list{
+  display:grid;
+  gap:8px;
+  margin-top:12px;
+}
+.class-row-editor{
+  display:grid;
+  grid-template-columns:110px 48px 1fr auto;
+  gap:8px;
+  align-items:center;
+}
+.color-input{
+  width:42px;
+  height:36px;
+  padding:2px;
+}
+dialog{
+  border:0;
+  border-radius:12px;
+  width:min(760px,94vw);
+  box-shadow:0 15px 55px #0004;
+  padding:0;
+}
+dialog::backdrop{background:#0005}
+.modal{padding:20px}
+.modal h2{margin-top:0}
+.notice{
+  padding:10px 12px;
+  border-radius:8px;
+  background:#f5f7f9;
+  color:#59616a;
+  font-size:13px;
+}
+@media(max-width:750px){
+  .builder,.obs-text,.dialog-grid{grid-template-columns:1fr}
+  .status{width:100%;margin-left:0}
+  .class-row-editor{grid-template-columns:1fr 48px}
+  .class-row-editor input[type="text"]{grid-column:1/-1}
+  .class-row-editor button{grid-column:1/-1}
+}
+
+.cloud-login{position:fixed;inset:0;background:#0007;display:flex;align-items:center;justify-content:center;z-index:50;padding:20px}
+.cloud-login.hidden{display:none}
+.cloud-card{background:#fff;border-radius:16px;padding:24px;width:min(430px,94vw);box-shadow:0 20px 70px #0005}
+.cloud-card h2{margin:0 0 8px}.cloud-card .sub{margin-bottom:16px}.cloud-card label{margin-top:12px}.cloud-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px}
+.cloud-user{font-size:12px;color:#69717b;margin-left:auto;align-self:center}
+</style>
+</head>
+
+<body>
+<div id="cloudLogin" class="cloud-login hidden">
+  <div class="cloud-card">
+    <h2>☁️ Schülerdokumentation synchronisieren</h2>
+    <div class="sub">Mit deinem persönlichen Konto kannst du die Daten auf iPhone, iPad und Mac gemeinsam verwenden.</div>
+    <label for="cloudEmail">E-Mail</label>
+    <input id="cloudEmail" type="email" autocomplete="email" placeholder="deine@email.de">
+    <label for="cloudPassword">Passwort</label>
+    <input id="cloudPassword" type="password" autocomplete="current-password" placeholder="Mindestens 6 Zeichen">
+    <div id="cloudLoginMsg" class="notice" style="margin-top:12px;display:none"></div>
+    <div class="cloud-actions">
+      <button onclick="closeCloudLogin()">Abbrechen</button>
+      <button onclick="cloudSignUp()">Konto anlegen</button>
+      <button class="primary" onclick="cloudSignIn()">Anmelden</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <h1>Schülerdokumentation</h1>
+  <div class="sub">Schüler auswählen, Beobachtungsbausteine zuweisen und die Entwicklung fortlaufend dokumentieren.</div>
+
+  <div class="toolbar">
+    <button class="primary" onclick="openAddStudent()">＋ Schüler hinzufügen</button>
+    <button onclick="showHoursOverview()">🗓 Stundenübersicht</button>
+    <button onclick="openClassManager()">🎨 Klassen verwalten</button>
+    <button onclick="saveToFile()">💾 Speichern</button>
+    <button onclick="exportJsonBackup()">⬇️ JSON-Backup</button>
+    <button onclick="openFile()">📂 Datei öffnen</button>
+    <button onclick="openSyncFile()">📁 Sync-Datei öffnen</button>
+    <button onclick="syncNow()">🔄 Synchronisieren</button>
+    <button onclick="openCloudLogin()">☁️ Cloud</button>
+    <span id="cloudUser" class="cloud-user"></span>
+    <span id="status" class="status">Automatisch lokal gespeichert</span>
+  </div>
+
+  <div class="sync-info">
+    <b>Offline + lokale Synchronisation:</b>
+    Die Daten bleiben auf diesem Gerät. Eine gemeinsame JSON-Datei kann bei Bedarf zwischen Geräten abgeglichen werden.
+  </div>
+</header>
+
+<main>
+  <section id="overview" class="view active">
+    <h2>Schüler auswählen</h2>
+    <div id="studentGrid" class="student-grid"></div>
+  </section>
+
+  <section id="hours" class="view">
+    <div class="detail-head">
+      <button class="back" onclick="showOverview()">← Übersicht</button>
+      <div style="flex:1">
+        <h2>Stundenübersicht</h2>
+        <div class="sub">Fortlaufende Übersicht über Datum, Klasse, Stunde, Thema, Förderziel und Sonstiges.</div>
+      </div>
+      <button class="primary" onclick="addHourEntry()">＋ Eintrag hinzufügen</button>
+    </div>
+
+    <div class="info">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+        <div>
+          <b>Stundenübersicht</b>
+          <div class="sub">Einträge werden lokal gespeichert und über die Sync-Datei mit anderen Geräten zusammengeführt.</div>
+        </div>
+        <div class="toolbar" style="margin-top:0">
+          <button onclick="exportHoursCSV()">📄 CSV exportieren</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="hoursTable">
+        <thead>
+          <tr>
+            <th>Datum</th>
+            <th>Klasse</th>
+            <th>Stunde</th>
+            <th>Thema</th>
+            <th>Förderziel</th>
+            <th>Sonstiges</th>
+            <th style="width:130px"></th>
+          </tr>
+        </thead>
+        <tbody id="hoursBody"></tbody>
+      </table>
+    </div>
+    <div id="hoursEmpty" class="empty" style="margin-top:12px;display:none">Noch keine Stunden eingetragen.</div>
+  </section>
+
+  <section id="detail" class="view">
+    <div class="detail-head">
+      <button class="back" onclick="showOverview()">← Alle Schüler</button>
+      <div style="flex:1">
+        <h2 id="detailName"></h2>
+        <div id="detailInfo" class="sub"></div>
+      </div>
+      <button onclick="printStudent()">🖨 Beobachtungsübersicht drucken</button>
+    </div>
+
+    <div class="info">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+        <div>
+          <h3>Beobachtungsbausteine</h3>
+          <div class="sub">Diese Bausteine werden bei jeder neuen Beobachtung angezeigt.</div>
+        </div>
+        <button onclick="openAssign()">Bausteine zuweisen</button>
+      </div>
+      <div id="assigned" class="selected-list" style="margin-top:12px"></div>
+    </div>
+
+    <div class="info">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+        <div>
+          <h3>Neue Beobachtung</h3>
+          <div class="sub">Alle zugewiesenen Unterbausteine können separat mit 1–5 Sternen bewertet werden.</div>
+        </div>
+        <button class="primary" onclick="addObservation()">＋ Beobachtung hinzufügen</button>
+      </div>
+    </div>
+
+    <h3>Beobachtungen</h3>
+    <div id="observations"></div>
+
+    <div class="info" style="margin-top:24px">
+      <h3>Gesamtentwicklung</h3>
+      <div class="sub">Entwicklung der einzelnen Unterbausteine über alle Beobachtungstermine.</div>
+      <div id="development" style="margin-top:12px"></div>
+    </div>
+  </section>
+</main>
+
+<dialog id="studentDialog">
+  <div class="modal">
+    <h2>Schüler hinzufügen</h2>
+    <label for="studentName">Name des Schülers</label>
+    <input id="studentName" placeholder="Vorname Nachname">
+
+    <label for="studentClass" style="margin-top:12px">Klasse</label>
+    <input id="studentClass" placeholder="z. B. 4a">
+
+    <div class="dialog-actions">
+      <button onclick="studentDialog.close()">Abbrechen</button>
+      <button class="primary" onclick="addStudent()">Hinzufügen</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="assignDialog">
+  <div class="modal">
+    <h2>Beobachtungsbausteine zuweisen</h2>
+    <div id="builder" class="builder"></div>
+    <div class="dialog-actions">
+      <button onclick="assignDialog.close()">Abbrechen</button>
+      <button class="primary" onclick="saveAssigned()">Übernehmen</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="obsDialog">
+  <div class="modal">
+    <h2>Neue Beobachtung</h2>
+
+    <label for="obsDate">Datum</label>
+    <input id="obsDate" type="date">
+
+    <div id="obsRatings" style="margin-top:15px"></div>
+
+    <div class="obs-text" style="margin-top:15px">
+      <div>
+        <label for="obsIdeas">Beobachtungen</label>
+        <textarea id="obsIdeas" placeholder="Eigene Beobachtungen eintragen"></textarea>
+      </div>
+
+      <div>
+        <label for="obsSuggestions">Fördervorschläge</label>
+        <textarea id="obsSuggestions" placeholder="Eigene Fördervorschläge eintragen oder KI-Vorschläge einfügen"></textarea>
+        <button type="button" style="margin-top:7px" onclick="generateSuggestions()">✨ KI-Fördervorschläge</button>
+        <div class="sub" style="margin-top:5px">Die KI-Funktion benötigt die lokale API unter <code>/api/foerdervorschlaege</code>.</div>
+      </div>
+
+      <div style="grid-column:1/-1">
+        <label for="obsNotes">Notizen</label>
+        <textarea id="obsNotes"></textarea>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button onclick="obsDialog.close()">Abbrechen</button>
+      <button class="primary" onclick="saveObservation()">Speichern</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="hourDialog">
+  <div class="modal">
+    <h2 id="hourDialogTitle">Stunde hinzufügen</h2>
+
+    <div class="dialog-grid">
+      <div>
+        <label for="hourDate">Datum</label>
+        <input id="hourDate" type="date">
+      </div>
+
+      <div>
+        <label for="hourClass">Klasse</label>
+        <input id="hourClass" placeholder="z. B. 4a">
+      </div>
+
+      <div>
+        <label for="hourNumber">Stunde</label>
+        <input id="hourNumber" placeholder="z. B. 1 oder 1.–2.">
+      </div>
+
+      <div>
+        <label for="hourTopic">Thema</label>
+        <input id="hourTopic" placeholder="Thema der Stunde">
+      </div>
+
+      <div style="grid-column:1/-1">
+        <label for="hourGoal">Förderziel</label>
+        <input id="hourGoal" placeholder="Wird für die Klasse gespeichert">
+      </div>
+
+      <div style="grid-column:1/-1">
+        <label for="hourOther">Sonstiges</label>
+        <textarea id="hourOther" placeholder="Notizen, Besonderheiten, Material …"></textarea>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button onclick="hourDialog.close()">Abbrechen</button>
+      <button class="primary" onclick="saveHourEntry()">Speichern</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="classDialog">
+  <div class="modal">
+    <h2>Klassen verwalten</h2>
+    <div class="notice">
+      Jede Klasse erhält dauerhaft dieselbe Farbe. Das Förderziel wird ebenfalls pro Klasse gespeichert und automatisch in der Stundenübersicht verwendet.
+    </div>
+    <div id="classList" class="class-list"></div>
+
+    <div class="dialog-actions">
+      <button onclick="classDialog.close()">Schließen</button>
+      <button class="primary" onclick="addClassEntry()">＋ Klasse hinzufügen</button>
+      <button onclick="saveClassSettings()">Speichern</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="syncDialog">
+  <div class="modal">
+    <h2>Synchronisation prüfen</h2>
+    <div id="syncSummary" class="info" style="margin-top:0"></div>
+    <div class="dialog-actions">
+      <button onclick="syncDialog.close()">Abbrechen</button>
+      <button class="primary" onclick="confirmSync()">Zusammenführen & speichern</button>
+    </div>
+  </div>
+</dialog>
+
+<input id="fileInput" type="file" accept=".json,application/json" hidden>
+<input id="syncFileInput" type="file" accept=".json,application/json" hidden>
+
+<script>
+"use strict";
+
+const KEY = "schueler-dokumentation-v4";
+
+// Supabase Cloud-Synchronisation
+const SUPABASE_URL = "https://simwmxgnqikcuczorvza.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_U352HTBrbq8jOAnaNtid-w_VlO7rYE3";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+let cloudUser = null;
+let cloudSaveTimer = null;
+
+
+const BAUSTEINE = {
+  "Lern- und Arbeitsverhalten": {
+    color:"#4C78A8",
+    items:[
+      ["Aufmerksamkeit","#9ECAE1"],
+      ["Konzentration","#6BAED6"],
+      ["Anstrengungsbereitschaft","#3182BD"],
+      ["Mitarbeit","#08519C"],
+      ["Motivation","#74C476"],
+      ["Selbstständigkeit","#31A354"],
+      ["Sorgfalt","#006D2C"],
+      ["Arbeitsgeschwindigkeit","#A1D99B"]
+    ]
+  },
+  "Sozialverhalten": {
+    color:"#E45756",
+    items:[
+      ["Konfliktverhalten","#FC9272"],
+      ["Aggression","#DE2D26"],
+      ["Regeleinhaltung","#A50F15"],
+      ["Verhalten gegenüber Lehrern","#FB6A4A"]
+    ]
+  },
+  "Mathe": {
+    color:"#F2CF5B",
+    items:[
+      ["Richtigkeit","#D9A441"],
+      ["Schnelligkeit","#B8860B"],
+      ["Anwendung","#E6B800"],
+      ["Verständnis von Begriffen","#C49A00"],
+      ["Nutzung vorhandenen Wissens","#8C6D1F"]
+    ]
+  },
+  "Deutsch": {
+    color:"#B279A2",
+    items:[
+      ["Richtigkeit","#9C4D97"],
+      ["Schnelligkeit","#7A3E7A"],
+      ["Anwendung","#C17CB0"],
+      ["Verständnis von Begriffen","#A85D9E"],
+      ["Nutzung vorhandenen Wissens","#7F4F7F"],
+      ["Lesegeschwindigkeit","#D291BC"],
+      ["Rechtschreibung","#6F3D6F"],
+      ["Lesbarkeit","#B565A7"]
+    ]
+  }
+};
+
+const CLASS_COLORS = [
+  "#4C78A8","#E45756","#59A14F","#F28E2B","#B279A2","#76B7B2",
+  "#EDC948","#AF7AA1","#FF9DA7","#9C755F","#2F4B7C","#7A5195"
+];
+
+let state = loadState();
+let selectedId = null;
+let fileHandle = null;
+let syncFileHandle = null;
+let pendingRatings = {};
+let syncCandidate = null;
+let editingHourId = null;
+
+function uid(){
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+}
+
+function esc(value){
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[char]));
+}
+
+function normalizeClassName(value){
+  return String(value || "").trim().toLocaleLowerCase("de-DE");
+}
+
+function classColor(cls){
+  const key = normalizeClassName(cls);
+  if(!key) return "#cfd4da";
+
+  if(!state.classColors[key]){
+    const used = Object.values(state.classColors);
+    state.classColors[key] =
+      CLASS_COLORS.find(c => !used.includes(c)) ||
+      CLASS_COLORS[Object.keys(state.classColors).length % CLASS_COLORS.length];
+  }
+
+  return state.classColors[key];
+}
+
+function classBadge(cls){
+  if(!cls) return "";
+  const color = classColor(cls);
+
+  return `<span class="class-badge"
+    style="background:${color}18;border:1px solid ${color};color:${color}">
+    ${esc(cls)}
+  </span>`;
+}
+
+async function refreshCloudSession(){
+  try{
+    const {data:{session}} = await supabaseClient.auth.getSession();
+    cloudUser = session?.user || null;
+    updateCloudUi();
+    if(cloudUser) await loadCloudState();
+  }catch(error){
+    console.warn("Cloud-Sitzung:",error);
+    setStatus("Cloud nicht verfügbar","sync-warn");
+  }
+}
+
+function updateCloudUi(){
+  const el=document.getElementById("cloudUser");
+  if(el) el.textContent=cloudUser ? "☁️ " + (cloudUser.email || "angemeldet") : "";
+}
+
+function openCloudLogin(){
+  if(cloudUser){
+    if(confirm("Cloud-Konto abmelden? Die lokalen Daten bleiben auf diesem Gerät erhalten.")) supabaseClient.auth.signOut().then(()=>{cloudUser=null;updateCloudUi();setStatus("Cloud abgemeldet");});
+    return;
+  }
+  document.getElementById("cloudLogin").classList.remove("hidden");
+  setTimeout(()=>document.getElementById("cloudEmail").focus(),50);
+}
+function closeCloudLogin(){ document.getElementById("cloudLogin").classList.add("hidden"); }
+function cloudMessage(text,error=false){ const el=document.getElementById("cloudLoginMsg"); el.textContent=text; el.style.display="block"; el.style.color=error?"#9b2c2c":"#2f6f44"; }
+
+async function cloudSignUp(){
+  const email=document.getElementById("cloudEmail").value.trim();
+  const password=document.getElementById("cloudPassword").value;
+  if(!email || password.length<6){ cloudMessage("Bitte E-Mail und ein Passwort mit mindestens 6 Zeichen eingeben.",true); return; }
+  const {error}=await supabaseClient.auth.signUp({email,password});
+  if(error){ cloudMessage(error.message,true); return; }
+  cloudMessage("Konto angelegt. Falls eine Bestätigungs-E-Mail kommt, bitte dort bestätigen und danach anmelden.");
+}
+
+async function cloudSignIn(){
+  const email=document.getElementById("cloudEmail").value.trim();
+  const password=document.getElementById("cloudPassword").value;
+  if(!email || !password){ cloudMessage("Bitte E-Mail und Passwort eingeben.",true); return; }
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+  if(error){ cloudMessage(error.message,true); return; }
+  cloudUser=data.user;
+  updateCloudUi();
+  closeCloudLogin();
+  await loadCloudState();
+}
+
+async function loadCloudState(){
+  if(!cloudUser) return;
+  setStatus("Cloud-Daten werden geladen …");
+  const {data,error}=await supabaseClient
+    .from("app_data")
+    .select("data")
+    .eq("user_id",cloudUser.id)
+    .maybeSingle();
+  if(error){
+    console.error(error);
+    setStatus("Cloud-Laden fehlgeschlagen","sync-warn");
+    alert("Die Cloud-Verbindung konnte nicht geladen werden. Bitte prüfe in Supabase, dass die Tabelle app_data und die RLS-Regeln angelegt sind.");
+    return;
+  }
+  if(data?.data){
+    state=normalizeState(data.data);
+    localStorage.setItem(KEY,JSON.stringify(state));
+    renderStudents();
+    renderHours();
+    setStatus("Cloud-Daten geladen","sync-ok");
+  }else{
+    await saveCloudState();
+    setStatus("Cloud-Speicher vorbereitet","sync-ok");
+  }
+}
+
+async function saveCloudState(){
+  if(!cloudUser) return;
+  const payload={user_id:cloudUser.id,data:normalizeState(state)};
+  const {error}=await supabaseClient.from("app_data").upsert(payload,{onConflict:"user_id"});
+  if(error){
+    console.error(error);
+    setStatus("Cloud-Speichern fehlgeschlagen","sync-warn");
+    return;
+  }
+  setStatus("Cloud gespeichert · "+new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}),"sync-ok");
+}
+
+function queueCloudSave(){
+  if(!cloudUser) return;
+  clearTimeout(cloudSaveTimer);
+  cloudSaveTimer=setTimeout(()=>saveCloudState(),500);
+}
+
+function setStatus(text, kind=""){
+  const el = document.getElementById("status");
+  el.textContent = text;
+  el.className = "status" + (kind ? " " + kind : "");
+}
+
+function persist(){
+  normalizeState(state);
+  localStorage.setItem(KEY, JSON.stringify(state));
+  queueCloudSave();
+  setStatus(
+    "Automatisch lokal gespeichert · " +
+    new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})
+  );
+}
+
+function normalizeState(input){
+  const st = input && typeof input === "object" ? input : {};
+
+  if(!Array.isArray(st.students)) st.students = [];
+  if(!Array.isArray(st.hours)) st.hours = [];
+  if(!st.classColors || typeof st.classColors !== "object") st.classColors = {};
+
+  st.students.forEach(s => {
+    if(!s.id) s.id = uid();
+    if(typeof s.name !== "string") s.name = "";
+    if(typeof s.klasse !== "string") s.klasse = "";
+    if(!Array.isArray(s.assigned)) s.assigned = [];
+    if(!Array.isArray(s.observations)) s.observations = [];
+
+    if(s.klasse) classColor(s.klasse);
+
+    s.observations.forEach(o => {
+      if(!o.id) o.id = observationKey(o);
+      if(!o.ratings || typeof o.ratings !== "object") o.ratings = {};
+      if(typeof o.ideas !== "string") o.ideas = "";
+      if(typeof o.suggestions !== "string") o.suggestions = "";
+      if(typeof o.notes !== "string") o.notes = "";
+    });
+  });
+
+  st.hours.forEach(h => {
+    if(!h.id) h.id = hourKey(h);
+    if(typeof h.date !== "string") h.date = "";
+    if(typeof h.klasse !== "string") h.klasse = "";
+    if(typeof h.stunde !== "string") h.stunde = "";
+    if(typeof h.thema !== "string") h.thema = "";
+    if(typeof h.foerderziel !== "string") h.foerderziel = "";
+    if(typeof h.sonstiges !== "string") h.sonstiges = "";
+
+    if(h.klasse) classColor(h.klasse);
+  });
+
+  return st;
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    return normalizeState(raw ? JSON.parse(raw) : {
+      students:[],
+      hours:[],
+      classColors:{}
+    });
+  }catch(error){
+    console.error(error);
+    return {students:[],hours:[],classColors:{}};
+  }
+}
+
+function allKeys(){
+  const result = [];
+  Object.entries(BAUSTEINE).forEach(([group,data]) => {
+    data.items.forEach(([item]) => result.push(group + "|" + item));
+  });
+  return result;
+}
+
+function splitKey(key){
+  const index = key.indexOf("|");
+  if(index === -1) return {o:key,u:""};
+  return {
+    o:key.slice(0,index),
+    u:key.slice(index + 1)
+  };
+}
+
+function getStudent(){
+  return state.students.find(s => s.id === selectedId);
+}
+
+/* ---------------- Übersicht ---------------- */
+
+function renderStudents(){
+  const grid = document.getElementById("studentGrid");
+  grid.innerHTML = "";
+
+  if(!state.students.length){
+    grid.innerHTML = `
+      <div class="empty" style="grid-column:1/-1">
+        <b>Noch keine Schüler angelegt.</b><br><br>
+        Klicke auf „＋ Schüler hinzufügen“.
+      </div>`;
+    return;
+  }
+
+  state.students.forEach(student => {
+    const card = document.createElement("div");
+    card.className = "student-card";
+    card.onclick = () => openStudent(student.id);
+
+    const color = student.klasse ? classColor(student.klasse) : "#cfd4da";
+    card.style.borderColor = color;
+    card.style.background = `linear-gradient(135deg, ${color}12, #fff 55%)`;
+
+    const count = (student.observations || []).length;
+
+    card.innerHTML = `
+      <div class="student-name">${esc(student.name)}</div>
+      <div class="student-meta">
+        ${student.klasse ? classBadge(student.klasse) + " · " : ""}
+        ${count} Beobachtung${count === 1 ? "" : "en"}
+      </div>`;
+
+    grid.appendChild(card);
+  });
+}
+
+function showOverview(){
+  document.getElementById("overview").classList.add("active");
+  document.getElementById("detail").classList.remove("active");
+  document.getElementById("hours").classList.remove("active");
+  selectedId = null;
+  renderStudents();
+}
+
+function openStudent(id){
+  selectedId = id;
+  const student = getStudent();
+  if(!student) return;
+
+  document.getElementById("overview").classList.remove("active");
+  document.getElementById("hours").classList.remove("active");
+  document.getElementById("detail").classList.add("active");
+
+  document.getElementById("detailName").textContent = student.name;
+  document.getElementById("detailInfo").innerHTML =
+    student.klasse ? classBadge(student.klasse) : "";
+
+  renderAssigned();
+  renderObservations();
+  renderDevelopment();
+}
+
+/* ---------------- Schüler ---------------- */
+
+function openAddStudent(){
+  document.getElementById("studentName").value = "";
+  document.getElementById("studentClass").value = "";
+  document.getElementById("studentDialog").showModal();
+  setTimeout(() => document.getElementById("studentName").focus(), 50);
+}
+
+function addStudent(){
+  const name = document.getElementById("studentName").value.trim();
+  const klasse = document.getElementById("studentClass").value.trim();
+
+  if(!name){
+    alert("Bitte einen Namen eingeben.");
+    return;
+  }
+
+  if(klasse) classColor(klasse);
+
+  state.students.push({
+    id:uid(),
+    name,
+    klasse,
+    assigned:[],
+    observations:[]
+  });
+
+  persist();
+  document.getElementById("studentDialog").close();
+  renderStudents();
+}
+
+/* ---------------- Bausteine ---------------- */
+
+function renderAssigned(){
+  const student = getStudent();
+  const target = document.getElementById("assigned");
+
+  if(!student) return;
+
+  target.innerHTML = (student.assigned || []).map(key => {
+    const x = splitKey(key);
+    const group = BAUSTEINE[x.o];
+    const item = group?.items.find(([name]) => name === x.u);
+
+    return `
+      <span class="chip"
+        style="border-color:${item?.[1] || group?.color || "#cdd3d9"}">
+        <b style="color:${group?.color || "#20252b"}">${esc(x.o)}</b>
+        → ${esc(x.u)}
+      </span>`;
+  }).join("") || '<span class="sub">Noch keine Bausteine zugewiesen.</span>';
+}
+
+function openAssign(){
+  const student = getStudent();
+  if(!student) return;
+
+  const chosen = new Set(student.assigned || []);
+  const builder = document.getElementById("builder");
+  builder.innerHTML = "";
+
+  Object.entries(BAUSTEINE).forEach(([groupName, group]) => {
+    const box = document.createElement("div");
+    box.className = "box";
+    box.style.borderTop = `5px solid ${group.color}`;
+
+    box.innerHTML = `
+      <h4 style="color:${group.color}">${esc(groupName)}</h4>
+      <div class="checks">
+        ${group.items.map(([itemName,itemColor]) => {
+          const key = groupName + "|" + itemName;
+          return `
+            <label>
+              <input type="checkbox"
+                     value="${esc(key)}"
+                     ${chosen.has(key) ? "checked" : ""}>
+              <span style="
+                width:10px;height:10px;border-radius:50%;
+                background:${itemColor};
+                display:inline-block;flex:none"></span>
+              ${esc(itemName)}
+            </label>`;
+        }).join("")}
+      </div>`;
+
+    builder.appendChild(box);
+  });
+
+  document.getElementById("assignDialog").showModal();
+}
+
+function saveAssigned(){
+  const student = getStudent();
+  if(!student) return;
+
+  student.assigned = [
+    ...document.querySelectorAll("#builder input[type=checkbox]:checked")
+  ].map(input => input.value);
+
+  persist();
+  document.getElementById("assignDialog").close();
+  renderAssigned();
+}
+
+/* ---------------- Beobachtungen ---------------- */
+
+function addObservation(){
+  const student = getStudent();
+
+  if(!student) return;
+
+  if(!(student.assigned || []).length){
+    alert("Bitte zuerst Beobachtungsbausteine zuweisen.");
+    return;
+  }
+
+  pendingRatings = {};
+
+  document.getElementById("obsDate").value =
+    new Date().toISOString().slice(0,10);
+  document.getElementById("obsIdeas").value = "";
+  document.getElementById("obsSuggestions").value = "";
+  document.getElementById("obsNotes").value = "";
+
+  const target = document.getElementById("obsRatings");
+
+  target.innerHTML =
+    "<div class='ratings'>" +
+    student.assigned.map(key => {
+      const x = splitKey(key);
+      pendingRatings[key] = 0;
+
+      return `
+        <div class="rating-row">
+          <div><b>${esc(x.o)}</b> → ${esc(x.u)}</div>
+          <div class="stars" data-key="${esc(key)}">${stars(key)}</div>
+        </div>`;
+    }).join("") +
+    "</div>";
+
+  document.getElementById("obsDialog").showModal();
+}
+
+function stars(key){
+  const value = pendingRatings[key] || 0;
+
+  return [1,2,3,4,5].map(number => `
+    <button type="button"
+            onclick="setRating(${JSON.stringify(key)},${number})">
+      ${number <= value ? "★" : "☆"}
+    </button>
+  `).join("");
+}
+
+function setRating(key, value){
+  pendingRatings[key] = value;
+
+  const element = document.querySelector(
+    `.stars[data-key="${CSS.escape(key)}"]`
+  );
+
+  if(element) element.innerHTML = stars(key);
+}
+
+function saveObservation(){
+  const student = getStudent();
+  if(!student) return;
+
+  const ratings = {};
+  Object.keys(pendingRatings).forEach(key => {
+    ratings[key] = pendingRatings[key] || 0;
+  });
+
+  if(Object.values(ratings).every(value => value === 0)){
+    alert("Bitte mindestens einen Baustein bewerten.");
+    return;
+  }
+
+  if(!student.observations) student.observations = [];
+
+  student.observations.push({
+    id:uid(),
+    date:document.getElementById("obsDate").value,
+    ratings,
+    ideas:document.getElementById("obsIdeas").value,
+    suggestions:document.getElementById("obsSuggestions").value,
+    notes:document.getElementById("obsNotes").value
+  });
+
+  persist();
+  document.getElementById("obsDialog").close();
+  renderObservations();
+  renderDevelopment();
+}
+
+function renderObservations(){
+  const student = getStudent();
+  const target = document.getElementById("observations");
+
+  if(!student) return;
+
+  target.innerHTML = "";
+
+  if(!student.observations?.length){
+    target.innerHTML = '<div class="empty">Noch keine Beobachtungen vorhanden.</div>';
+    return;
+  }
+
+  [...student.observations].reverse().forEach((observation, reverseIndex) => {
+    const realIndex = student.observations.length - 1 - reverseIndex;
+    const div = document.createElement("div");
+    div.className = "observation";
+
+    const rows = Object.entries(observation.ratings || {}).map(([key,value]) => {
+      const x = splitKey(key);
+
+      return `
+        <div class="rating-row">
+          <div><b>${esc(x.o)}</b> → ${esc(x.u)}</div>
+          <div class="stars">
+            ${[1,2,3,4,5].map(i =>
+              `<span>${i <= value ? "★" : "☆"}</span>`
+            ).join("")}
+          </div>
+        </div>`;
+    }).join("");
+
+    div.innerHTML = `
+      <div class="obs-top">
+        <div class="obs-date">
+          ${observation.date
+            ? new Date(observation.date+"T12:00:00").toLocaleDateString("de-DE")
+            : "Ohne Datum"}
+        </div>
+        <button onclick="deleteObservation(${realIndex})">Löschen</button>
+      </div>
+
+      <div class="ratings">${rows}</div>
+
+      <div class="obs-text">
+        <div>
+          <label>Beobachtungen</label>
+          <div>${formatText(observation.ideas) || "—"}</div>
+        </div>
+
+        <div>
+          <label>Fördervorschläge</label>
+          <div>${formatText(observation.suggestions) || "—"}</div>
+        </div>
+
+        <div style="grid-column:1/-1">
+          <label>Notizen</label>
+          <div>${formatText(observation.notes) || "—"}</div>
+        </div>
+      </div>`;
+
+    target.appendChild(div);
+  });
+}
+
+function formatText(value){
+  return esc(value).replace(/\n/g,"<br>");
+}
+
+function deleteObservation(index){
+  const student = getStudent();
+  if(!student) return;
+
+  if(!confirm("Diese Beobachtung wirklich löschen?")) return;
+
+  student.observations.splice(index,1);
+  persist();
+  renderObservations();
+  renderDevelopment();
+}
+
+/* ---------------- KI ---------------- */
+
+async function generateSuggestions(){
+  const student = getStudent();
+  if(!student) return;
+
+  const rated = Object.entries(pendingRatings)
+    .filter(([,value]) => value > 0)
+    .map(([key,value]) => {
+      const x = splitKey(key);
+      return `${x.o} → ${x.u}: ${value}/5`;
+    })
+    .join("\n");
+
+  if(!rated){
+    alert("Bitte zuerst mindestens einen Unterbaustein bewerten.");
+    return;
+  }
+
+  const buttons = [...document.querySelectorAll("button")];
+  const button = buttons.find(b =>
+    b.textContent.includes("KI-Fördervorschläge")
+  );
+
+  if(button){
+    button.disabled = true;
+    button.textContent = "⏳ Vorschläge werden erstellt…";
+  }
+
+  try{
+    const response = await fetch("/api/foerdervorschlaege",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        student:student.name,
+        ratings:rated,
+        observations:document.getElementById("obsIdeas").value || "",
+        notes:document.getElementById("obsNotes").value || ""
+      })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+      throw new Error(data.error || "Fehler bei der KI-Anfrage");
+    }
+
+    document.getElementById("obsSuggestions").value =
+      data.suggestions || "";
+  }catch(error){
+    alert(
+      "Die KI-Schnittstelle konnte nicht erreicht werden.\n\n" +
+      error.message
+    );
+  }finally{
+    if(button){
+      button.disabled = false;
+      button.textContent = "✨ KI-Fördervorschläge";
+    }
+  }
+}
+
+/* ---------------- Entwicklung ---------------- */
+
+function renderDevelopment(){
+  const student = getStudent();
+  const target = document.getElementById("development");
+
+  if(!student) return;
+
+  const observations = student.observations || [];
+  const keys = student.assigned || [];
+
+  if(!observations.length){
+    target.innerHTML =
+      '<div class="empty">Sobald Beobachtungen vorhanden sind, erscheint hier das Entwicklungsdiagramm.</div>';
+    return;
+  }
+
+  const allKeys = [
+    ...new Set([
+      ...keys,
+      ...observations.flatMap(o => Object.keys(o.ratings || {}))
+    ])
+  ];
+
+  const dates = observations.map(o => o.date);
+  const W = Math.max(560,(dates.length - 1) * 105 + 60);
+  const H = 280;
+
+  const xPercent = index =>
+    dates.length === 1 ? 50 : (index / (dates.length - 1)) * 100;
+
+  const bottomPercent = value =>
+    ((value - 1) / 4) * 100;
+
+  let grid = "";
+
+  for(let value = 1; value <= 5; value++){
+    const bottom = bottomPercent(value);
+
+    grid += `
+      <div class="gridline" style="bottom:${bottom}%"></div>
+      <div class="ylabel" style="bottom:${Math.max(0,bottom-2)}%">
+        ${value} / 5
+      </div>`;
+  }
+
+  const headLabels = dates.map((date,index) => `
+    <div style="
+      position:absolute;
+      left:${xPercent(index)}%;
+      bottom:-27px;
+      transform:translateX(-50%);
+      font-size:11px;
+      color:#69717b">
+      ${date
+        ? new Date(date+"T12:00:00").toLocaleDateString("de-DE")
+        : ""}
+    </div>
+  `).join("");
+
+  const lines = [];
+  const legend = [];
+
+  allKeys.forEach(key => {
+    const x = splitKey(key);
+    const group = BAUSTEINE[x.o];
+    const item = group?.items.find(([name]) => name === x.u);
+    const color = item?.[1] || group?.color || "#20252b";
+
+    const points = observations
+      .map((observation,index) => ({
+        index,
+        value:Number(observation.ratings?.[key] || 0)
+      }))
+      .filter(point => point.value > 0);
+
+    let segments = "";
+
+    for(let i = 1; i < points.length; i++){
+      const p = points[i-1];
+      const q = points[i];
+
+      const x1 = xPercent(p.index);
+      const x2 = xPercent(q.index);
+
+      const y1 = 100 - bottomPercent(p.value);
+      const y2 = 100 - bottomPercent(q.value);
+
+      const dx = (x2-x1) * W / 100;
+      const dy = (y2-y1) * H / 100;
+      const length = Math.sqrt(dx*dx + dy*dy);
+      const angle = Math.atan2(dy,dx) * 180 / Math.PI;
+
+      segments += `
+        <div class="chart-segment"
+          style="
+            background:${color};
+            left:${x1}%;
+            top:${y1}%;
+            width:${length}px;
+            transform:rotate(${angle}deg)">
+        </div>`;
+    }
+
+    const pointsHtml = points.map(point => `
+      <div
+        class="chart-point"
+        title="${esc(x.u)}: ${point.value}/5"
+        style="
+          border-color:${color};
+          left:${xPercent(point.index)}%;
+          bottom:${bottomPercent(point.value)}%">
+      </div>
+    `).join("");
+
+    lines.push(segments + pointsHtml);
+
+    legend.push(`
+      <div class="legend-item">
+        <span class="legend-dot" style="background:${color}"></span>
+        ${esc(x.o)} → ${esc(x.u)}
+      </div>`);
+  });
+
+  target.innerHTML = `
+    <div class="chart-wrap">
+      <div class="chart-title">Entwicklung der Bewertungen</div>
+
+      <div class="chart-scroll">
+        <div style="position:relative;width:${W+190}px">
+          <div class="chart-area" style="width:${W}px;height:${H}px">
+            ${grid}
+            ${lines.map(line => `<div class="chart-line">${line}</div>`).join("")}
+            ${headLabels}
+          </div>
+
+          <div class="chart-legend">
+            ${legend.join("")}
+          </div>
+        </div>
+      </div>
+
+      <div class="legend">
+        1 = niedrig · 5 = sehr gut.
+        Jeder Unterbaustein wird als eigene Entwicklungslinie dargestellt.
+      </div>
+    </div>`;
+}
+
+/* ---------------- Drucken ---------------- */
+
+function printStudent(){
+  const student = getStudent();
+  if(!student) return;
+
+  const printWindow = window.open("","_blank");
+  if(!printWindow){
+    alert("Das Druckfenster wurde vom Browser blockiert. Bitte Pop-ups für diese Seite erlauben.");
+    return;
+  }
+
+  const rows = (student.observations || []).map(observation => {
+    const ratings = Object.entries(observation.ratings || {})
+      .map(([key,value]) => {
+        const x = splitKey(key);
+        return `
+          <div>
+            <b>${esc(x.o)} → ${esc(x.u)}</b>:
+            ${"★".repeat(value)}${"☆".repeat(5-value)}
+          </div>`;
+      }).join("");
+
+    return `
+      <section class="print-obs">
+        <h3>
+          ${observation.date
+            ? new Date(observation.date+"T12:00:00").toLocaleDateString("de-DE")
+            : "Ohne Datum"}
+        </h3>
+
+        <div>${ratings}</div>
+
+        <p>
+          <b>Beobachtungen:</b><br>
+          ${formatText(observation.ideas) || "—"}
+        </p>
+
+        <p>
+          <b>Fördervorschläge:</b><br>
+          ${formatText(observation.suggestions) || "—"}
+        </p>
+
+        <p>
+          <b>Notizen:</b><br>
+          ${formatText(observation.notes) || "—"}
+        </p>
+      </section>`;
+  }).join("");
+
+  const printHtml = `<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Beobachtungsübersicht – ${esc(student.name)}</title>
+<style>
+body{
+  font-family:Arial,sans-serif;
+  margin:30px;
+  color:#222;
+}
+h1{font-size:24px}
+h3{
+  border-bottom:1px solid #aaa;
+  padding-bottom:5px;
+}
+.print-obs{
+  break-inside:avoid;
+  border:1px solid #ddd;
+  border-radius:8px;
+  padding:14px;
+  margin:12px 0;
+}
+p{line-height:1.45}
+@media print{
+  button{display:none}
+}
+</style>
+</head>
+<body>
+<h1>Beobachtungsübersicht</h1>
+<p>
+  <b>Schüler:</b>
+  ${esc(student.name)}
+  ${student.klasse ? " · Klasse " + esc(student.klasse) : ""}
+</p>
+${rows || "<p>Keine Beobachtungen vorhanden.</p>"}
+</body>
+</html>`;
+
+  printWindow.document.open();
+  printWindow.document.write(printHtml);
+  printWindow.document.close();
+  printWindow.focus();
+
+  setTimeout(() => printWindow.print(),300);
+}
+
+/* ---------------- Klassen ---------------- */
+
+function getClasses(){
+  const map = new Map();
+
+  state.students.forEach(student => {
+    if(student.klasse){
+      const key = normalizeClassName(student.klasse);
+      if(!map.has(key)){
+        map.set(key,{
+          name:student.klasse,
+          color:classColor(student.klasse),
+          goal:""
+        });
+      }
+    }
+  });
+
+  state.hours.forEach(hour => {
+    if(hour.klasse){
+      const key = normalizeClassName(hour.klasse);
+
+      if(!map.has(key)){
+        map.set(key,{
+          name:hour.klasse,
+          color:classColor(hour.klasse),
+          goal:hour.foerderziel || ""
+        });
+      }else if(hour.foerderziel && !map.get(key).goal){
+        map.get(key).goal = hour.foerderziel;
+      }
+    }
+  });
+
+  if(state.classGoals && typeof state.classGoals === "object"){
+    Object.entries(state.classGoals).forEach(([key,goal]) => {
+      if(map.has(key)) map.get(key).goal = goal;
+    });
+  }
+
+  return [...map.values()].sort((a,b) =>
+    a.name.localeCompare(b.name,"de")
+  );
+}
+
+function openClassManager(){
+  const classes = getClasses();
+  const list = document.getElementById("classList");
+  list.innerHTML = "";
+
+  if(!classes.length){
+    list.innerHTML = `
+      <div class="empty">
+        Noch keine Klassen vorhanden.
+      </div>`;
+  }
+
+  classes.forEach(item => {
+    list.appendChild(createClassEditor(item.name,item.color,item.goal));
+  });
+
+  document.getElementById("classDialog").showModal();
+}
+
+function createClassEditor(name,color,goal){
+  const row = document.createElement("div");
+  row.className = "class-row-editor";
+  row.dataset.original = normalizeClassName(name);
+
+  row.innerHTML = `
+    <input type="text" value="${esc(name)}" aria-label="Klasse">
+    <input type="color" class="color-input" value="${color}" aria-label="Farbe">
+    <input type="text" value="${esc(goal)}" placeholder="Förderziel" aria-label="Förderziel">
+    <button type="button" onclick="this.parentElement.remove()">Entfernen</button>
+  `;
+
+  return row;
+}
+
+function addClassEntry(){
+  const list = document.getElementById("classList");
+
+  if(list.querySelector(".empty")){
+    list.innerHTML = "";
+  }
+
+  const row = createClassEditor(
+    "",
+    CLASS_COLORS[Object.keys(state.classColors).length % CLASS_COLORS.length],
+    ""
+  );
+
+  list.appendChild(row);
+  row.querySelector("input[type=text]").focus();
+}
+
+function saveClassSettings(){
+  const rows = [
+    ...document.querySelectorAll("#classList .class-row-editor")
+  ];
+
+  if(!state.classGoals) state.classGoals = {};
+
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll("input");
+    const name = inputs[0].value.trim();
+    const color = inputs[1].value;
+    const goal = inputs[2].value.trim();
+    const original = row.dataset.original;
+
+    if(!name) return;
+
+    const key = normalizeClassName(name);
+    state.classColors[key] = color;
+    state.classGoals[key] = goal;
+
+    if(original && original !== key){
+      delete state.classColors[original];
+      delete state.classGoals[original];
+    }
+  });
+
+  state.students.forEach(student => {
+    if(student.klasse) classColor(student.klasse);
+  });
+
+  state.hours.forEach(hour => {
+    if(hour.klasse){
+      const key = normalizeClassName(hour.klasse);
+      hour.foerderziel = state.classGoals?.[key] || hour.foerderziel || "";
+    }
+  });
+
+  persist();
+  document.getElementById("classDialog").close();
+  renderStudents();
+  renderHours();
+
+  if(selectedId) openStudent(selectedId);
+
+  setStatus("Klassenfarben und Förderziele gespeichert","sync-ok");
+}
+
+function getClassGoal(cls){
+  const key = normalizeClassName(cls);
+  return state.classGoals?.[key] || "";
+}
+
+/* ---------------- Stundenübersicht ---------------- */
+
+function showHoursOverview(){
+  document.getElementById("overview").classList.remove("active");
+  document.getElementById("detail").classList.remove("active");
+  document.getElementById("hours").classList.add("active");
+  selectedId = null;
+  renderHours();
+}
+
+function renderHours(){
+  const rows = [...(state.hours || [])].sort((a,b) => {
+    const dateCompare = String(b.date || "").localeCompare(String(a.date || ""));
+    if(dateCompare !== 0) return dateCompare;
+    return String(a.stunde || "").localeCompare(String(b.stunde || ""));
+  });
+
+  const body = document.getElementById("hoursBody");
+  body.innerHTML = "";
+
+  document.getElementById("hoursEmpty").style.display =
+    rows.length ? "none" : "block";
+
+  rows.forEach(hour => {
+    const tr = document.createElement("tr");
+    tr.className = "class-row";
+
+    const color = hour.klasse ? classColor(hour.klasse) : "#ddd";
+    tr.style.borderLeftColor = color;
+
+    const goal = getClassGoal(hour.klasse) || hour.foerderziel || "";
+
+    tr.innerHTML = `
+      <td>
+        ${hour.date
+          ? new Date(hour.date+"T12:00:00").toLocaleDateString("de-DE")
+          : ""}
+      </td>
+
+      <td>${classBadge(hour.klasse)}</td>
+
+      <td>${esc(hour.stunde)}</td>
+
+      <td>${esc(hour.thema)}</td>
+
+      <td>${formatText(goal)}</td>
+
+      <td>${formatText(hour.sonstiges)}</td>
+
+      <td class="small-actions">
+        <button onclick="editHourEntry(${JSON.stringify(hour.id)})">Bearbeiten</button>
+        <button onclick="deleteHourEntry(${JSON.stringify(hour.id)})">Löschen</button>
+      </td>`;
+
+    body.appendChild(tr);
+  });
+}
+
+function addHourEntry(){
+  editingHourId = null;
+
+  document.getElementById("hourDialogTitle").textContent =
+    "Stunde hinzufügen";
+
+  document.getElementById("hourDate").value =
+    new Date().toISOString().slice(0,10);
+  document.getElementById("hourClass").value = "";
+  document.getElementById("hourNumber").value = "";
+  document.getElementById("hourTopic").value = "";
+  document.getElementById("hourGoal").value = "";
+  document.getElementById("hourOther").value = "";
+
+  document.getElementById("hourDialog").showModal();
+  setTimeout(() => document.getElementById("hourClass").focus(),50);
+}
+
+function editHourEntry(id){
+  const hour = (state.hours || []).find(item => item.id === id);
+  if(!hour) return;
+
+  editingHourId = id;
+
+  document.getElementById("hourDialogTitle").textContent =
+    "Stunde bearbeiten";
+
+  document.getElementById("hourDate").value = hour.date || "";
+  document.getElementById("hourClass").value = hour.klasse || "";
+  document.getElementById("hourNumber").value = hour.stunde || "";
+  document.getElementById("hourTopic").value = hour.thema || "";
+
+  const goal = getClassGoal(hour.klasse) || hour.foerderziel || "";
+  document.getElementById("hourGoal").value = goal;
+
+  document.getElementById("hourOther").value = hour.sonstiges || "";
+
+  document.getElementById("hourDialog").showModal();
+}
+
+function saveHourEntry(){
+  const klasse = document.getElementById("hourClass").value.trim();
+  const classGoal = document.getElementById("hourGoal").value.trim();
+
+  if(klasse){
+    classColor(klasse);
+
+    if(!state.classGoals) state.classGoals = {};
+
+    if(classGoal){
+      state.classGoals[normalizeClassName(klasse)] = classGoal;
+    }
+  }
+
+  const data = {
+    id:editingHourId || uid(),
+    date:document.getElementById("hourDate").value,
+    klasse,
+    stunde:document.getElementById("hourNumber").value.trim(),
+    thema:document.getElementById("hourTopic").value.trim(),
+    foerderziel:classGoal,
+    sonstiges:document.getElementById("hourOther").value
+  };
+
+  if(
+    !data.date &&
+    !data.klasse &&
+    !data.stunde &&
+    !data.thema &&
+    !data.foerderziel &&
+    !data.sonstiges.trim()
+  ){
+    alert("Bitte mindestens ein Feld ausfüllen.");
+    return;
+  }
+
+  const index = state.hours.findIndex(
+    hour => hour.id === editingHourId
+  );
+
+  if(index >= 0){
+    state.hours[index] = data;
+  }else{
+    state.hours.push(data);
+  }
+
+  persist();
+  document.getElementById("hourDialog").close();
+  renderHours();
+  setStatus("Stundenübersicht gespeichert","sync-ok");
+}
+
+function deleteHourEntry(id){
+  if(!confirm("Diesen Stundeneintrag wirklich löschen?")) return;
+
+  state.hours = (state.hours || []).filter(hour => hour.id !== id);
+  persist();
+  renderHours();
+}
+
+function exportHoursCSV(){
+  const header = [
+    "Datum",
+    "Klasse",
+    "Stunde",
+    "Thema",
+    "Förderziel",
+    "Sonstiges"
+  ];
+
+  const rows = (state.hours || []).map(hour => [
+    hour.date || "",
+    hour.klasse || "",
+    hour.stunde || "",
+    hour.thema || "",
+    getClassGoal(hour.klasse) || hour.foerderziel || "",
+    hour.sonstiges || ""
+  ]);
+
+  const csv = [header,...rows]
+    .map(row =>
+      row.map(value =>
+        '"' + String(value).replaceAll('"','""') + '"'
+      ).join(";")
+    )
+    .join("\r\n");
+
+  download(
+    "\ufeff" + csv,
+    "stundenuebersicht.csv",
+    "text/csv;charset=utf-8"
+  );
+}
+
+/* ---------------- Synchronisation ---------------- */
+
+function observationKey(observation){
+  const raw = JSON.stringify({
+    date:observation.date || "",
+    ratings:observation.ratings || {},
+    ideas:observation.ideas || "",
+    suggestions:observation.suggestions || "",
+    notes:observation.notes || ""
+  });
+
+  return "obs-" + simpleHash(raw);
+}
+
+function hourKey(hour){
+  const raw = JSON.stringify({
+    date:hour.date || "",
+    klasse:hour.klasse || "",
+    stunde:hour.stunde || "",
+    thema:hour.thema || "",
+    foerderziel:hour.foerderziel || "",
+    sonstiges:hour.sonstiges || ""
+  });
+
+  return "hour-" + simpleHash(raw);
+}
+
+function simpleHash(raw){
+  let hash = 2166136261;
+
+  for(let i=0;i<raw.length;i++){
+    hash ^= raw.charCodeAt(i);
+    hash = Math.imul(hash,16777619);
+  }
+
+  return (hash >>> 0).toString(36);
+}
+
+function studentKey(student){
+  return (
+    normalizeClassName(student.name) + "|" +
+    normalizeClassName(student.klasse)
+  );
+}
+
+function mergeStates(base,incoming){
+  base = normalizeState(base);
+  incoming = normalizeState(incoming);
+
+  base.classColors = {
+    ...(base.classColors || {}),
+    ...(incoming.classColors || {})
+  };
+
+  base.classGoals = {
+    ...(base.classGoals || {}),
+    ...(incoming.classGoals || {})
+  };
+
+  const existingHours = new Map(
+    (base.hours || []).map(hour => [
+      hour.id || hourKey(hour),
+      hour
+    ])
+  );
+
+  (incoming.hours || []).forEach(hour => {
+    const key = hour.id || hourKey(hour);
+
+    if(!existingHours.has(key)){
+      existingHours.set(key,{...hour,id:key});
+    }
+  });
+
+  base.hours = [...existingHours.values()]
+    .sort((a,b) =>
+      String(a.date || "").localeCompare(String(b.date || ""))
+    );
+
+  incoming.students.forEach(source => {
+    let target =
+      base.students.find(s => s.id === source.id) ||
+      base.students.find(s => studentKey(s) === studentKey(source));
+
+    if(!target){
+      target = JSON.parse(JSON.stringify(source));
+      target.id = target.id || uid();
+      base.students.push(target);
+      return;
+    }
+
+    if(!target.name && source.name) target.name = source.name;
+    if(!target.klasse && source.klasse) target.klasse = source.klasse;
+
+    target.assigned = [
+      ...new Set([
+        ...(target.assigned || []),
+        ...(source.assigned || [])
+      ])
+    ];
+
+    const existingObservations = new Map(
+      (target.observations || []).map(observation => [
+        observation.id || observationKey(observation),
+        observation
+      ])
+    );
+
+    (source.observations || []).forEach(observation => {
+      const key = observation.id || observationKey(observation);
+
+      if(!existingObservations.has(key)){
+        existingObservations.set(key,{
+          ...observation,
+          id:key
+        });
+      }
+    });
+
+    target.observations = [...existingObservations.values()]
+      .sort((a,b) =>
+        String(a.date || "").localeCompare(String(b.date || ""))
+      );
+  });
+
+  return normalizeState(base);
+}
+
+function prepareSync(remote){
+  remote = normalizeState(remote);
+  const local = normalizeState(state);
+
+  let newStudents = 0;
+  let newObservations = 0;
+  let existingStudents = 0;
+
+  remote.students.forEach(source => {
+    const target =
+      local.students.find(s => s.id === source.id) ||
+      local.students.find(s => studentKey(s) === studentKey(source));
+
+    if(!target){
+      newStudents++;
+      return;
+    }
+
+    existingStudents++;
+
+    const ids = new Set(
+      (target.observations || []).map(
+        observation => observation.id || observationKey(observation)
+      )
+    );
+
+    (source.observations || []).forEach(observation => {
+      const id = observation.id || observationKey(observation);
+
+      if(!ids.has(id)) newObservations++;
+    });
+  });
+
+  syncCandidate = remote;
+
+  document.getElementById("syncSummary").innerHTML = `
+    <div class="sync-stat">
+      <span>Neue Schüler</span><b>${newStudents}</b>
+      <span>Neue Beobachtungen</span><b>${newObservations}</b>
+      <span>Bereits vorhandene Schüler</span><b>${existingStudents}</b>
+      <span>Konflikte</span><b>0</b>
+    </div>
+
+    <p style="margin-bottom:0">
+      Die vorhandenen Daten werden <b>nicht gelöscht</b>.
+      Neue Beobachtungen und Stundeneinträge werden ergänzt.
+      Bereits vorhandene Einträge werden nicht doppelt angelegt.
+    </p>`;
+
+  document.getElementById("syncDialog").showModal();
+}
+
+function confirmSync(){
+  if(!syncCandidate){
+    document.getElementById("syncDialog").close();
+    return;
+  }
+
+  state = mergeStates(state,syncCandidate);
+  persist();
+  renderStudents();
+  renderHours();
+
+  if(selectedId) openStudent(selectedId);
+
+  syncCandidate = null;
+  document.getElementById("syncDialog").close();
+
+  setStatus(
+    "Daten zusammengeführt – jetzt „Synchronisieren“ zum Speichern klicken",
+    "sync-ok"
+  );
+}
+
+async function saveToFile(){
+  state = normalizeState(state);
+
+  // Auf iPhone/iPad ist der direkte Zugriff auf bereits heruntergeladene
+  // Dateien im Safari-Browser eingeschränkt. Wenn die Cloud aktiv ist,
+  // speichern wir deshalb immer in den persönlichen Cloud-Speicher.
+  if(cloudUser){
+    await saveCloudState();
+    return;
+  }
+
+  // Auf Browsern mit File System Access API kann weiterhin dieselbe
+  // ausgewählte JSON-Datei überschrieben werden.
+  const data = JSON.stringify(state,null,2);
+  try{
+    if(!fileHandle && window.showSaveFilePicker){
+      fileHandle = await window.showSaveFilePicker({
+        suggestedName:"schueler-dokumentation.json",
+        types:[{
+          description:"Dokumentationsdatei",
+          accept:{"application/json":[".json"]}
+        }]
+      });
+    }
+
+    if(fileHandle){
+      const writable = await fileHandle.createWritable();
+      await writable.write(data);
+      await writable.close();
+      setStatus("In dieselbe Datei gespeichert","sync-ok");
+      return;
+    }
+  }catch(error){
+    if(error.name === "AbortError") return;
+  }
+
+  alert(
+    "Auf iPhone/iPad kann Safari eine bereits heruntergeladene JSON-Datei nicht automatisch überschreiben.\n\n" +
+    "Bitte zuerst über ☁️ Cloud anmelden. Danach speichert „Speichern“ immer in deinen persönlichen Cloud-Speicher.\n\n" +
+    "Für eine separate Sicherungsdatei kannst du „⬇️ JSON-Backup“ verwenden."
+  );
+}
+
+function exportJsonBackup(){
+  state = normalizeState(state);
+  const data = JSON.stringify(state,null,2);
+  const stamp = new Date().toISOString().slice(0,10);
+  download(data, `schueler-dokumentation-backup-${stamp}.json`, "application/json");
+  setStatus("JSON-Backup heruntergeladen","sync-ok");
+}
+
+async function openFile(){
+  if(window.showOpenFilePicker){
+    try{
+      const [handle] = await window.showOpenFilePicker({
+        types:[{
+          description:"Dokumentationsdatei",
+          accept:{"application/json":[".json"]}
+        }]
+      });
+
+      fileHandle = handle;
+
+      const file = await handle.getFile();
+      state = normalizeState(JSON.parse(await file.text()));
+
+      persist();
+      showOverview();
+      renderHours();
+
+      setStatus(
+        "Datei geöffnet und lokal übernommen",
+        "sync-ok"
+      );
+
+      return;
+    }catch(error){
+      if(error.name === "AbortError") return;
+
+      alert(
+        "Die Datei konnte nicht geöffnet werden.\n\n" +
+        error.message
+      );
+      return;
+    }
+  }
+
+  document.getElementById("fileInput").click();
+}
+
+document.getElementById("fileInput").addEventListener("change",async event => {
+  const file = event.target.files[0];
+  if(!file) return;
+
+  try{
+    state = normalizeState(JSON.parse(await file.text()));
+    persist();
+    showOverview();
+    renderHours();
+
+    setStatus(
+      "Datei geöffnet und lokal übernommen",
+      "sync-ok"
+    );
+  }catch(error){
+    alert("Ungültige JSON-Datei.\n\n" + error.message);
+  }
+
+  event.target.value = "";
+});
+
+async function openSyncFile(){
+  if(window.showOpenFilePicker){
+    try{
+      const [handle] = await window.showOpenFilePicker({
+        types:[{
+          description:"Lokale Synchronisationsdatei",
+          accept:{"application/json":[".json"]}
+        }]
+      });
+
+      syncFileHandle = handle;
+
+      const file = await handle.getFile();
+      const remote = normalizeState(
+        JSON.parse(await file.text())
+      );
+
+      prepareSync(remote);
+      return;
+    }catch(error){
+      if(error.name === "AbortError") return;
+
+      alert(
+        "Die Sync-Datei konnte nicht gelesen werden.\n\n" +
+        error.message
+      );
+      return;
+    }
+  }
+
+  document.getElementById("syncFileInput").click();
+}
+
+document.getElementById("syncFileInput").addEventListener("change",async event => {
+  const file = event.target.files[0];
+  if(!file) return;
+
+  try{
+    const remote = normalizeState(
+      JSON.parse(await file.text())
+    );
+
+    syncFileHandle = null;
+    prepareSync(remote);
+  }catch(error){
+    alert("Ungültige Sync-Datei.\n\n" + error.message);
+  }
+
+  event.target.value = "";
+});
+
+async function syncNow(){
+  state = normalizeState(state);
+  const data = JSON.stringify(state,null,2);
+
+  if(syncFileHandle){
+    try{
+      const writable = await syncFileHandle.createWritable();
+      await writable.write(data);
+      await writable.close();
+
+      setStatus(
+        "Synchronisation abgeschlossen – dieselbe lokale Datei wurde aktualisiert",
+        "sync-ok"
+      );
+
+      return;
+    }catch(error){
+      if(error.name === "AbortError") return;
+    }
+  }
+
+  download(
+    data,
+    "schueler-daten-synchronisiert.json",
+    "application/json"
+  );
+
+  setStatus(
+    "Zusammengeführte Sync-Datei heruntergeladen – alte Datei damit ersetzen",
+    "sync-ok"
+  );
+}
+
+function download(data,name,type){
+  const anchor = document.createElement("a");
+  const url = URL.createObjectURL(
+    new Blob([data],{type})
+  );
+
+  anchor.href = url;
+  anchor.download = name;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url),1000);
+}
+
+/* ---------------- Start ---------------- */
+
+persist();
+renderStudents();
+renderHours();
+refreshCloudSession();
+
+</script>
+</body>
+</html>
