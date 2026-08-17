@@ -358,7 +358,6 @@ dialog::backdrop{background:#0005}
     <button onclick="showHoursOverview()">🗓 Stundenübersicht</button>
     <button onclick="openClassManager()">🎨 Klassen verwalten</button>
     <button onclick="saveToFile()">💾 Speichern</button>
-    <button onclick="exportJsonBackup()">⬇️ JSON-Backup</button>
     <button onclick="openFile()">📂 Datei öffnen</button>
     <button onclick="openSyncFile()">📁 Sync-Datei öffnen</button>
     <button onclick="syncNow()">🔄 Synchronisieren</button>
@@ -1745,9 +1744,16 @@ function renderHours(){
       <td>${formatText(hour.sonstiges)}</td>
 
       <td class="small-actions">
-        <button onclick="editHourEntry(${JSON.stringify(hour.id)})">Bearbeiten</button>
-        <button onclick="deleteHourEntry(${JSON.stringify(hour.id)})">Löschen</button>
+        <button type="button" class="edit-hour-btn">Bearbeiten</button>
+        <button type="button" class="delete-hour-btn">Löschen</button>
       </td>`;
+
+    const editButton = tr.querySelector(".edit-hour-btn");
+    const deleteButton = tr.querySelector(".delete-hour-btn");
+
+    // iPhone/iPad: Ereignisse direkt registrieren statt Inline-onclick zu verwenden.
+    editButton.addEventListener("click", () => editHourEntry(hour.id));
+    deleteButton.addEventListener("click", () => deleteHourEntry(hour.id));
 
     body.appendChild(tr);
   });
@@ -2091,18 +2097,8 @@ function confirmSync(){
 
 async function saveToFile(){
   state = normalizeState(state);
-
-  // Auf iPhone/iPad ist der direkte Zugriff auf bereits heruntergeladene
-  // Dateien im Safari-Browser eingeschränkt. Wenn die Cloud aktiv ist,
-  // speichern wir deshalb immer in den persönlichen Cloud-Speicher.
-  if(cloudUser){
-    await saveCloudState();
-    return;
-  }
-
-  // Auf Browsern mit File System Access API kann weiterhin dieselbe
-  // ausgewählte JSON-Datei überschrieben werden.
   const data = JSON.stringify(state,null,2);
+
   try{
     if(!fileHandle && window.showSaveFilePicker){
       fileHandle = await window.showSaveFilePicker({
@@ -2118,6 +2114,7 @@ async function saveToFile(){
       const writable = await fileHandle.createWritable();
       await writable.write(data);
       await writable.close();
+
       setStatus("In dieselbe Datei gespeichert","sync-ok");
       return;
     }
@@ -2125,19 +2122,13 @@ async function saveToFile(){
     if(error.name === "AbortError") return;
   }
 
-  alert(
-    "Auf iPhone/iPad kann Safari eine bereits heruntergeladene JSON-Datei nicht automatisch überschreiben.\n\n" +
-    "Bitte zuerst über ☁️ Cloud anmelden. Danach speichert „Speichern“ immer in deinen persönlichen Cloud-Speicher.\n\n" +
-    "Für eine separate Sicherungsdatei kannst du „⬇️ JSON-Backup“ verwenden."
+  download(
+    data,
+    "schueler-dokumentation.json",
+    "application/json"
   );
-}
 
-function exportJsonBackup(){
-  state = normalizeState(state);
-  const data = JSON.stringify(state,null,2);
-  const stamp = new Date().toISOString().slice(0,10);
-  download(data, `schueler-dokumentation-backup-${stamp}.json`, "application/json");
-  setStatus("JSON-Backup heruntergeladen","sync-ok");
+  setStatus("Datei wurde heruntergeladen","sync-ok");
 }
 
 async function openFile(){
