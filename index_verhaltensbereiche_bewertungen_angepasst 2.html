@@ -1,0 +1,1847 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Schülerdokumentation</title>
+<meta name="theme-color" content="#4C78A8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+:root{
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  color:#20252b;background:#f4f5f7;
+}
+*{box-sizing:border-box}
+body{margin:0}
+header{
+  background:#fff;border-bottom:1px solid #ddd;padding:18px 22px;
+  position:sticky;top:0;z-index:5
+}
+h1{margin:0 0 5px;font-size:23px}
+h2{margin:0 0 16px}
+h3{margin:0 0 8px}
+.sub{color:#69717b;font-size:13px}
+main{padding:22px;max-width:1250px;margin:auto}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+button{
+  border:1px solid #cfd4da;background:#fff;border-radius:8px;
+  padding:9px 12px;cursor:pointer;font:inherit
+}
+button:hover{background:#f7f8f9}
+button:disabled{opacity:.55;cursor:not-allowed}
+.primary{background:#20252b;color:#fff;border-color:#20252b}
+.danger{border-color:#d9534f;color:#b52b27}
+.status{font-size:12px;color:#69717b;margin-left:auto;align-self:center}
+.sync-info{font-size:12px;color:#69717b;margin-top:8px}
+.sync-ok{color:#2f6f44}.sync-warn{color:#8a5a00}
+.view{display:none}.view.active{display:block}
+.student-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px
+}
+.student-card{
+  background:#fff;border:2px solid #ddd;border-radius:12px;padding:14px;
+  cursor:pointer
+}
+.student-card:hover{box-shadow:0 4px 18px #00000010}
+.student-name{font-weight:700;font-size:17px}
+.student-meta{font-size:13px;color:#737b84;margin-top:5px}
+.student-actions{display:flex;gap:6px;margin-top:12px}
+.student-actions button{font-size:12px;padding:6px 8px}
+.empty{
+  background:#fff;border:1px dashed #bbb;border-radius:12px;padding:30px;
+  text-align:center;color:#69717b
+}
+.detail-head{
+  display:flex;align-items:center;gap:12px;margin-bottom:18px
+}
+.detail-head h2{margin:0}
+.info,.observation,.chart-wrap{
+  background:#fff;border:1px solid #ddd;border-radius:12px;padding:15px;margin-bottom:16px
+}
+.dialog-actions{
+  display:flex;gap:8px;margin-top:16px;justify-content:flex-end;flex-wrap:wrap
+}
+.dialog-grid,.obs-text{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px
+}
+label{
+  display:block;font-size:12px;font-weight:700;color:#626a73;margin-bottom:5px
+}
+input,textarea,select{
+  width:100%;padding:9px;border:1px solid #cfd4da;border-radius:8px;font:inherit
+}
+textarea{resize:vertical;min-height:75px}
+.builder{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px
+}
+.box{
+  border:1px solid #ddd;border-radius:10px;padding:12px;background:#fafbfc
+}
+.box h4{margin:0 0 9px}
+.checks{display:grid;gap:7px}
+.checks label{
+  font-weight:400;font-size:14px;display:flex;gap:8px;align-items:center
+}
+.checks input{width:auto}
+.selected-list{display:flex;flex-wrap:wrap;gap:6px}
+.chip{
+  padding:5px 8px;border:1px solid #cdd3d9;border-radius:999px;
+  background:#fff;font-size:12px
+}
+.obs-top{
+  display:flex;justify-content:space-between;gap:10px;align-items:center
+}
+.obs-date{font-weight:700}
+.ratings{
+  display:grid;grid-template-columns:1fr auto;gap:6px 16px;margin:14px 0
+}
+.rating-row{display:contents}
+.stars{white-space:nowrap;display:flex;align-items:center;gap:3px}
+.information-textarea{font-weight:400 !important;font-family:inherit !important;}
+textarea{width:100%;box-sizing:border-box;font:inherit;padding:9px;border:1px solid #cfd5dc;border-radius:8px;resize:vertical}
+ .traffic-buttons{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.traffic-btn{
+  border:2px solid transparent;border-radius:999px;min-width:78px;padding:7px 12px;
+  font:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:.12s ease;
+  background:#f3f4f6;color:#333;
+}
+.traffic-btn:hover{transform:translateY(-1px)}
+.traffic-btn.green{background:#22c55e;color:#fff}
+.traffic-btn.yellow{background:#facc15;color:#111}
+.traffic-btn.orange{background:#f97316;color:#fff}
+.traffic-btn.red{background:#ef4444;color:#fff}
+.traffic-btn.active{border-color:#111;box-shadow:0 0 0 2px #fff,0 0 0 4px #111;transform:scale(1.02)}
+.traffic-display{display:flex;align-items:center;justify-content:flex-end}
+.traffic-badge{display:inline-block;min-width:70px;text-align:center;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.traffic-badge.green{background:#22c55e;color:#fff}
+.traffic-badge.yellow{background:#facc15;color:#111}
+.traffic-badge.orange{background:#f97316;color:#fff}
+.traffic-badge.red{background:#ef4444;color:#fff}
+.clear-rating{border:0;background:transparent;color:#6b7280;font-size:12px;cursor:pointer;margin-left:2px}
+.stars .clear-rating:hover{background:#f5f6f8}
+.table-wrap{
+  background:#fff;border:1px solid #ddd;border-radius:12px;overflow:auto
+}
+table{border-collapse:collapse;width:100%;min-width:900px}
+th,td{padding:10px;border-bottom:1px solid #eee;vertical-align:top;text-align:left}
+th{
+  font-size:12px;color:#626a73;background:#fafbfc;position:sticky;top:0;z-index:1
+}
+.class-badge{
+  display:inline-block;padding:3px 8px;border-radius:999px;
+  font-weight:700;font-size:12px
+}
+.class-row{border-left:5px solid transparent}
+.small-actions{white-space:nowrap}
+.small-actions button{padding:6px 8px;font-size:12px}
+.class-list{display:grid;gap:8px;margin-top:12px}
+.class-row-editor{
+  display:grid;grid-template-columns:110px 48px 1fr auto;gap:8px;align-items:center
+}
+.color-input{width:42px;height:36px;padding:2px}
+.notice{
+  padding:10px 12px;border-radius:8px;background:#f5f7f9;
+  color:#59616a;font-size:13px
+}
+.chart-scroll{overflow-x:auto}
+.chart-area{
+  position:relative;height:280px;border-left:1px solid #aeb5bc;
+  border-bottom:1px solid #aeb5bc;margin:4px 12px 0 150px;min-width:560px
+}
+.gridline{position:absolute;left:0;right:0;border-top:1px dashed #d8dce0}
+.ylabel{
+  position:absolute;left:-145px;width:130px;text-align:right;
+  font-size:11px;color:#6b737b
+}
+.chart-point{
+  position:absolute;width:12px;height:12px;border:2px solid #20252b;
+  border-radius:50%;background:#fff;transform:translate(-50%,50%)
+}
+.chart-segment{
+  position:absolute;height:2px;background:#20252b;transform-origin:left center
+}
+.chart-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px;font-size:12px}
+.legend-item{display:flex;gap:6px;align-items:center}
+.legend-dot{width:9px;height:9px;border-radius:50%}
+
+.development-summary{border-top:1px solid #e2e5e8;padding-top:12px}
+.development-summary-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #eef0f2;font-size:13px}
+.development-summary-row strong{min-width:150px}
+.development-latest{color:#626a73;margin-left:auto}
+.development-trend{font-weight:700;min-width:58px;text-align:right}
+.development-trend.up{color:#16803c}
+.development-trend.down{color:#c62828}
+.development-trend.neutral{color:#69717b}
+.cloud-box{
+  position:fixed;inset:0;background:#0007;display:flex;align-items:center;
+  justify-content:center;z-index:50;padding:20px
+}
+.cloud-box.hidden{display:none}
+.cloud-card{
+  background:#fff;border-radius:16px;padding:24px;width:min(430px,94vw);
+  box-shadow:0 20px 70px #0005
+}
+.cloud-card h2{margin:0 0 8px}
+.cloud-card label{margin-top:12px}
+@media(max-width:750px){
+  .builder,.obs-text,.dialog-grid{grid-template-columns:1fr}
+  .status{width:100%;margin-left:0}
+  .class-row-editor{grid-template-columns:1fr 48px}
+  .class-row-editor input[type=text]{grid-column:1/-1}
+  .class-row-editor button{grid-column:1/-1}
+  header{position:static}
+}
+
+/* Verhaltensbereiche: bewusst einheitlich und ohne verschiedene Farben */
+.verhaltensbereich,
+.behavior-category,
+.behavior-group,
+.verhaltensbereich-group {
+  background: #fff !important;
+  color: inherit !important;
+  border-color: #d9dde3 !important;
+}
+.verhaltensbereich .category-header,
+.behavior-category .category-header,
+.behavior-group .category-header {
+  background: #f5f6f8 !important;
+  color: inherit !important;
+}
+.verhaltensbereich input,
+.verhaltensbereich textarea,
+.verhaltensbereich select,
+.behavior-category input,
+.behavior-category textarea,
+.behavior-category select {
+  background: #fff !important;
+}
+
+
+/* Verhaltensbereiche bearbeiten: einheitliche, einfarbige Gestaltung */
+#behaviorEditor,
+#verhaltensbereicheEditor,
+.behavior-editor,
+.verhaltensbereiche-editor,
+.behavior-editor *,
+.verhaltensbereiche-editor * {
+  background-image: none !important;
+}
+#behaviorEditor,
+#verhaltensbereicheEditor,
+.behavior-editor,
+.verhaltensbereiche-editor {
+  background: #f5f6f8 !important;
+  color: #222 !important;
+  border-color: #d9dde3 !important;
+}
+#behaviorEditor .behavior-category,
+#verhaltensbereicheEditor .behavior-category,
+.behavior-editor .behavior-category,
+.verhaltensbereiche-editor .behavior-category {
+  background: #fff !important;
+  color: #222 !important;
+  border-color: #d9dde3 !important;
+}
+#behaviorEditor .category-header,
+#verhaltensbereicheEditor .category-header,
+.behavior-editor .category-header,
+.verhaltensbereiche-editor .category-header {
+  background: #e9ebef !important;
+  color: #222 !important;
+}
+#behaviorEditor button,
+#verhaltensbereicheEditor button,
+.behavior-editor button,
+.verhaltensbereiche-editor button {
+  background: #fff !important;
+  color: #222 !important;
+  border-color: #cfd4da !important;
+}
+
+
+/* Verhaltensbereiche bearbeiten:
+   Oberbereiche: schwarz + fett
+   Unterbereiche: schwarz + normale Schrift */
+#behaviorEditor .behavior-category,
+#verhaltensbereicheEditor .behavior-category,
+.behavior-editor .behavior-category,
+.verhaltensbereiche-editor .behavior-category {
+  background: #fff !important;
+  color: #000 !important;
+  border-color: #d9dde3 !important;
+}
+
+#behaviorEditor .category-header,
+#verhaltensbereicheEditor .category-header,
+.behavior-editor .category-header,
+.verhaltensbereiche-editor .category-header {
+  background: #fff !important;
+  color: #000 !important;
+  font-weight: 700 !important;
+}
+
+#behaviorEditor .category-header *,
+#verhaltensbereicheEditor .category-header *,
+.behavior-editor .category-header *,
+.verhaltensbereiche-editor .category-header * {
+  color: #000 !important;
+  font-weight: 700 !important;
+}
+
+#behaviorEditor .subcategory,
+#verhaltensbereicheEditor .subcategory,
+.behavior-editor .subcategory,
+.verhaltensbereiche-editor .subcategory,
+#behaviorEditor .subarea,
+#verhaltensbereicheEditor .subarea,
+.behavior-editor .subarea,
+.verhaltensbereiche-editor .subarea {
+  background: #fff !important;
+  color: #000 !important;
+  font-weight: 400 !important;
+}
+
+#behaviorEditor .subcategory *,
+#verhaltensbereicheEditor .subcategory *,
+.behavior-editor .subcategory *,
+.verhaltensbereiche-editor .subcategory *,
+#behaviorEditor .subarea *,
+#verhaltensbereicheEditor .subarea *,
+.behavior-editor .subarea *,
+.verhaltensbereiche-editor .subarea * {
+  color: #000 !important;
+  font-weight: 400 !important;
+}
+
+/* Falls Unterbereiche als normale Listenelemente dargestellt werden */
+#behaviorEditor li,
+#verhaltensbereicheEditor li,
+.behavior-editor li,
+.verhaltensbereiche-editor li {
+  color: #000 !important;
+  font-weight: 400 !important;
+}
+
+
+/* FINAL OVERRIDE: all predefined behavior areas are black and uncolored */
+#behaviorEditor .behavior-category,
+#behaviorEditor .behavior-category *,
+#verhaltensbereicheEditor .behavior-category,
+#verhaltensbereicheEditor .behavior-category *,
+.behavior-editor .behavior-category,
+.behavior-editor .behavior-category *,
+.verhaltensbereiche-editor .behavior-category,
+.verhaltensbereiche-editor .behavior-category * {
+  color: #000000 !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border-color: #d9dde3 !important;
+}
+
+/* Oberbereiche: bold */
+#behaviorEditor .behavior-category > .category-header,
+#behaviorEditor .behavior-category > .category-header *,
+#verhaltensbereicheEditor .behavior-category > .category-header,
+#verhaltensbereicheEditor .behavior-category > .category-header *,
+.behavior-editor .behavior-category > .category-header,
+.behavior-editor .behavior-category > .category-header *,
+.verhaltensbereiche-editor .behavior-category > .category-header,
+.verhaltensbereiche-editor .behavior-category > .category-header * {
+  color: #000000 !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+/* Unterbereiche: normal */
+#behaviorEditor .behavior-category .subcategory,
+#behaviorEditor .behavior-category .subcategory *,
+#behaviorEditor .behavior-category .subarea,
+#behaviorEditor .behavior-category .subarea *,
+#verhaltensbereicheEditor .behavior-category .subcategory,
+#verhaltensbereicheEditor .behavior-category .subcategory *,
+#verhaltensbereicheEditor .behavior-category .subarea,
+#verhaltensbereicheEditor .behavior-category .subarea *,
+.behavior-editor .behavior-category .subcategory,
+.behavior-editor .behavior-category .subcategory *,
+.behavior-editor .behavior-category .subarea,
+.behavior-editor .behavior-category .subarea *,
+.verhaltensbereiche-editor .behavior-category .subcategory,
+.verhaltensbereiche-editor .behavior-category .subcategory *,
+.verhaltensbereiche-editor .behavior-category .subarea,
+.verhaltensbereiche-editor .behavior-category .subarea * {
+  color: #000000 !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  font-weight: 400 !important;
+}
+
+
+/* ENDGÜLTIG: Verhaltensbereiche ausschließlich schwarz/weiß */
+#assignDialog #builder .box {
+  border-top: 1px solid #d9dee5 !important;
+  background: #fff !important;
+  color: #000 !important;
+}
+#assignDialog #builder .box h4 {
+  color: #000 !important;
+  background: #fff !important;
+  font-weight: 700 !important;
+}
+#assignDialog #builder .box label,
+#assignDialog #builder .box label * {
+  color: #000 !important;
+  background: transparent !important;
+  font-weight: 400 !important;
+}
+#assignDialog #builder .box label input {
+  accent-color: #000 !important;
+}
+
+
+/* Ampelbewertung: kurze farbige Streifen ohne Farbwörter */
+.traffic-buttons{
+  display:flex;
+  gap:6px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.traffic-btn{
+  width:42px !important;
+  min-width:42px !important;
+  height:12px !important;
+  padding:0 !important;
+  border:2px solid transparent !important;
+  border-radius:3px !important;
+  font-size:23px !important;
+  line-height:1 !important;
+  cursor:pointer;
+  box-sizing:border-box;
+  transition:.12s ease;
+}
+.traffic-btn:hover{transform:scaleY(1.25)}
+.traffic-btn.green{background:#22c55e !important}
+.traffic-btn.yellow{background:#facc15 !important}
+.traffic-btn.orange{background:#f97316 !important}
+.traffic-btn.red{background:#ef4444 !important}
+.traffic-btn.active{
+  border-color:#111 !important;
+  box-shadow:0 0 0 2px #fff,0 0 0 4px #111 !important;
+  transform:scaleY(1.25);
+}
+.clear-rating{
+  border:0;
+  background:transparent;
+  color:#6b7280;
+  font-size:12px;
+  cursor:pointer;
+  margin-left:2px;
+}
+.traffic-display{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+}
+.traffic-badge{
+  display:block;
+  width:42px;
+  height:10px;
+  min-width:42px;
+  padding:0;
+  border-radius:3px;
+  font-size:0;
+  line-height:0;
+}
+.traffic-badge.green{background:#22c55e}
+.traffic-badge.yellow{background:#facc15}
+.traffic-badge.orange{background:#f97316}
+.traffic-badge.red{background:#ef4444}
+
+
+/* Ampel-Sterne: 4 anklickbare Sterne, jeweils in Ampelfarben */
+.traffic-buttons{
+  display:inline-flex;
+  gap:1px;
+  align-items:center;
+  flex-wrap:nowrap;
+}
+.traffic-btn{
+  width:auto !important;
+  min-width:0 !important;
+  height:auto !important;
+  padding:0 2px !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  font-size:23px !important;
+  line-height:1 !important;
+  cursor:pointer;
+  box-shadow:none !important;
+  transform:none !important;
+  color:#cbd5e1 !important;
+}
+.traffic-btn.green{color:#22c55e !important}
+.traffic-btn.yellow{color:#facc15 !important}
+.traffic-btn.orange{color:#f97316 !important}
+.traffic-btn.red{color:#ef4444 !important}
+.traffic-btn.active{
+  text-shadow:0 0 1px #111;
+  transform:scale(1.05) !important;
+}
+.traffic-btn:hover{
+  transform:scale(1.12) !important;
+}
+.traffic-display{
+  display:inline-flex;
+  align-items:center;
+  justify-content:flex-end;
+}
+.traffic-badge{
+  display:inline-block;
+  width:auto;
+  min-width:0;
+  height:auto;
+  padding:0;
+  border-radius:0;
+  font-size:23px;
+  line-height:1;
+  background:transparent !important;
+}
+.traffic-badge.green{color:#22c55e}
+.traffic-badge.yellow{color:#facc15}
+.traffic-badge.orange{color:#f97316}
+.traffic-badge.red{color:#ef4444}
+
+
+/* Sterne vollständig in der jeweiligen Ampelfarbe */
+.traffic-btn.red,
+.traffic-btn.red.active { color:#ef4444 !important; }
+.traffic-btn.orange,
+.traffic-btn.orange.active { color:#f97316 !important; }
+.traffic-btn.yellow,
+.traffic-btn.yellow.active { color:#facc15 !important; }
+.traffic-btn.green,
+.traffic-btn.green.active { color:#22c55e !important; }
+
+/* Gespeicherte Bewertungen ebenfalls komplett einfärben */
+.traffic-badge.red { color:#ef4444 !important; background:transparent !important; }
+.traffic-badge.orange { color:#f97316 !important; background:transparent !important; }
+.traffic-badge.yellow { color:#facc15 !important; background:transparent !important; }
+.traffic-badge.green { color:#22c55e !important; background:transparent !important; }
+
+
+/* FINAL: Sterne sichtbar */
+.traffic-buttons .traffic-btn {
+  display:inline-block !important;
+  width:auto !important;
+  min-width:0 !important;
+  height:auto !important;
+  padding:0 2px !important;
+  background:transparent !important;
+  border:0 !important;
+  font-family:Arial, "Segoe UI Symbol", sans-serif !important;
+  font-size:23px !important;
+  line-height:1 !important;
+  color:inherit !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  text-indent:0 !important;
+}
+.traffic-buttons .traffic-btn.red { color:#ef4444 !important; }
+.traffic-buttons .traffic-btn.orange { color:#f97316 !important; }
+.traffic-buttons .traffic-btn.yellow { color:#facc15 !important; }
+.traffic-buttons .traffic-btn.green { color:#22c55e !important; }
+.traffic-buttons .traffic-btn.active {
+  color:inherit !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+.traffic-buttons .traffic-btn.red.active { color:#ef4444 !important; }
+.traffic-buttons .traffic-btn.orange.active { color:#f97316 !important; }
+.traffic-buttons .traffic-btn.yellow.active { color:#facc15 !important; }
+.traffic-buttons .traffic-btn.green.active { color:#22c55e !important; }
+
+
+/* Genau fünf Sterne in einer Reihe */
+.traffic-buttons.five-stars{
+  display:inline-flex !important;
+  gap:1px !important;
+  align-items:center !important;
+  flex-wrap:nowrap !important;
+  white-space:nowrap !important;
+}
+.rating-star{
+  display:inline-block !important;
+  width:24px !important;
+  min-width:24px !important;
+  height:28px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  background:transparent !important;
+  font-family:Arial, "Segoe UI Symbol", sans-serif !important;
+  font-size:24px !important;
+  line-height:28px !important;
+  cursor:pointer !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+.rating-star.empty{
+  color:#cbd5e1 !important;
+}
+.rating-star.active.red{color:#ef4444 !important}
+.rating-star.active.orange{color:#f97316 !important}
+.rating-star.active.yellow{color:#facc15 !important}
+.rating-star.active.green{color:#22c55e !important}
+.rating-star:hover{
+  transform:scale(1.08);
+}
+
+
+.saved-five-stars{
+  display:inline-flex;
+  gap:1px;
+  white-space:nowrap;
+  font-family:Arial, "Segoe UI Symbol", sans-serif;
+  font-size:21px;
+  line-height:1;
+}
+.saved-five-stars .empty{color:#cbd5e1}
+.saved-five-stars .red{color:#ef4444}
+.saved-five-stars .orange{color:#f97316}
+.saved-five-stars .yellow{color:#facc15}
+.saved-five-stars .green{color:#22c55e}
+
+
+/* FINAL OVERRIDE: selected stars get the correct ampelfarbe */
+.traffic-buttons.five-stars .rating-star {
+  color:#cbd5e1 !important;
+  background:transparent !important;
+  border:0 !important;
+  text-shadow:none !important;
+}
+.traffic-buttons.five-stars .rating-star.active.red {
+  color:#ef4444 !important;
+}
+.traffic-buttons.five-stars .rating-star.active.orange {
+  color:#f97316 !important;
+}
+.traffic-buttons.five-stars .rating-star.active.yellow {
+  color:#facc15 !important;
+}
+.traffic-buttons.five-stars .rating-star.active.green {
+  color:#22c55e !important;
+}
+
+
+.traffic-buttons.five-stars{
+  display:inline-flex !important;
+  flex-wrap:nowrap !important;
+  gap:1px !important;
+  white-space:nowrap !important;
+  align-items:center !important;
+}
+.traffic-buttons.five-stars .rating-star{
+  display:inline-block !important;
+  width:26px !important;
+  min-width:26px !important;
+  height:30px !important;
+  padding:0 !important;
+  margin:0 !important;
+  border:0 !important;
+  background:transparent !important;
+  font-family:Arial, "Segoe UI Symbol", sans-serif !important;
+  font-size:25px !important;
+  line-height:30px !important;
+  cursor:pointer !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  text-shadow:none !important;
+}
+.traffic-buttons.five-stars .rating-star:hover{
+  transform:scale(1.1);
+}
+
+
+/* Gesamtentwicklung: Ampelfarben passend zur jeweiligen Bewertungsstufe */
+.development-point{
+  stroke:#fff;
+  stroke-width:2px;
+}
+.dev-red{fill:#ef4444}
+.dev-orange{fill:#f97316}
+.dev-yellow{fill:#facc15}
+.dev-green{fill:#22c55e}
+
+</style>
+</head>
+<body>
+
+<div id="cloudLogin" class="cloud-box hidden">
+  <div class="cloud-card">
+    <h2>☁️ Cloud-Synchronisation</h2>
+    <div class="sub">Mit deinem persönlichen Konto kannst du dieselben Daten auf mehreren Geräten verwenden.</div>
+    <label for="cloudEmail">E-Mail</label>
+    <input id="cloudEmail" type="email" autocomplete="email" placeholder="deine@email.de">
+    <label for="cloudPassword">Passwort</label>
+    <input id="cloudPassword" type="password" autocomplete="current-password" placeholder="Mindestens 6 Zeichen">
+    <div id="cloudMsg" class="notice" style="display:none;margin-top:12px"></div>
+    <div class="dialog-actions">
+      <button onclick="closeCloudLogin()">Abbrechen</button>
+      <button onclick="cloudSignUp()">Konto anlegen</button>
+      <button class="primary" onclick="cloudSignIn()">Anmelden</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <h1>Schülerdokumentation</h1>
+  <div class="sub">Schüler auswählen, Verhaltensbereiche zuweisen und die Entwicklung fortlaufend dokumentieren.</div>
+
+  <div class="toolbar">
+    <button class="primary" onclick="openAddStudent()">＋ Schüler hinzufügen</button>
+    <button onclick="showHoursOverview()">🗓 Stundenübersicht</button>
+    <button onclick="openClassManager()">🎨 Klassen verwalten</button>
+    <button onclick="saveAll()">💾 Speichern</button>
+    <button onclick="exportJSON()">⬇️ JSON-Backup</button>
+    <button onclick="openJSON()">📂 JSON öffnen</button>
+    <button onclick="openCloudLogin()">☁️ Cloud</button>
+    <span id="cloudUser" class="sub" style="margin-left:auto;align-self:center"></span>
+    <span id="status" class="status">Bereit</span>
+  </div>
+
+  <div class="sync-info">
+    <b>Wichtig:</b> „Speichern“ erzeugt <b>keine neue JSON-Datei</b>. Die Daten werden lokal gespeichert und – wenn Cloud aktiviert ist – direkt in deinem Cloud-Konto gesichert.
+    Eine JSON-Datei wird nur über „JSON-Backup“ bewusst erstellt.
+  </div>
+</header>
+
+<main>
+  <section id="overview" class="view active">
+    <h2>Schüler auswählen</h2>
+    <div id="studentGrid" class="student-grid"></div>
+  </section>
+
+  <section id="hours" class="view">
+    <div class="detail-head">
+      <button onclick="showOverview()">← Übersicht</button>
+      <div style="flex:1">
+        <h2>Stundenübersicht</h2>
+        <div class="sub">Fortlaufende Übersicht über Datum, Klasse, Stunde, Thema, Förderziel und Sonstiges.</div>
+      </div>
+      <button class="primary" onclick="addHourEntry()">＋ Eintrag hinzufügen</button>
+    </div>
+    <div class="info">
+      <b>Stundenübersicht</b>
+      <div class="sub">Klassenfarbe und Förderziel werden automatisch aus der Klassenverwaltung übernommen.</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Datum</th><th>Klasse</th><th>Stunde</th><th>Thema</th>
+          <th>Förderziel</th><th>Sonstiges</th><th></th>
+        </tr></thead>
+        <tbody id="hoursBody"></tbody>
+      </table>
+    </div>
+    <div id="hoursEmpty" class="empty" style="margin-top:12px;display:none">Noch keine Stunden eingetragen.</div>
+  </section>
+
+  <section id="detail" class="view">
+    <div class="detail-head">
+      <button onclick="showOverview()">← Alle Schüler</button>
+      <div style="flex:1">
+        <h2 id="detailName"></h2>
+        <div id="detailInfo" class="sub"></div>
+      </div>
+      
+<button onclick="editStudent(selectedId)">✏️ Name/Klasse/Informationen ändern</button>
+      <button onclick="printStudent()">🖨 Drucken</button>
+      <button class="danger" onclick="deleteSelectedStudent()">🗑️ Schüler löschen</button>
+    </div>
+
+    <div class="info">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+        <div><h3>Verhaltensbereiche</h3><div class="sub">Wähle die Verhaltensbereiche aus, die bei diesem Schüler beobachtet werden sollen. Eigene Bereiche und Unterbereiche können ergänzt werden.</div></div>
+        <button onclick="openAssign()">Verhaltensbereiche bearbeiten</button>
+      </div>
+      <!-- Die ausgewählten Verhaltensbereiche werden hier bewusst nicht nochmals angezeigt. -->
+    </div>
+
+    <div class="info">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+        <div><h3>Neue Beobachtung</h3><div class="sub">Die Ampel-Bewertung ist optional. Du kannst einzelne Verhaltensbereiche bewerten oder die Beobachtung ohne Sterne speichern.</div></div>
+        <button class="primary" onclick="addObservation()">＋ Beobachtung hinzufügen</button>
+      </div>
+    </div>
+
+    <h3>Beobachtungen</h3>
+    <div id="observations"></div>
+
+    <div class="info" style="margin-top:24px">
+      <div class="card" style="margin:0 0 20px 0">
+        <div class="section-title" style="font-size:20px">Informationen</div>
+        <textarea id="detailInformationen" class="information-textarea" rows="10" style="min-height:220px;font-size:16px;font-weight:400;font-family:inherit" placeholder="Informationen zum Schüler hier eintragen ..." oninput="saveDetailInformationen()"></textarea>
+        <div class="sub" style="margin-top:6px">Die Eingabe wird automatisch gespeichert.</div>
+      </div>
+      <h3>Gesamtentwicklung</h3>
+      <div class="sub">Entwicklung der einzelnen Unterbereiche über alle Beobachtungstermine.</div>
+      <div id="development" style="margin-top:12px"></div>
+    </div>
+  </section>
+</main>
+
+<dialog id="studentDialog">
+  <div class="info" style="margin:0;border:0">
+    <h2 id="studentDialogTitle">Schüler hinzufügen</h2>
+    <label for="studentName">Name des Schülers</label>
+    <input id="studentName" type="text" autocomplete="off" placeholder="Vorname Nachname">
+    <label for="studentClass" style="margin-top:12px">Klasse</label>
+    <input id="studentClass" type="text" autocomplete="off" placeholder="z. B. 5a">
+    <label for="studentInformationen" style="margin-top:12px">Informationen</label>
+    <textarea id="studentInformationen" rows="4" placeholder="z. B. Lerninformationen, Absprachen, wichtige Hinweise ..."></textarea>
+    <div id="studentEditHint" class="notice" style="margin-top:12px">
+      Name und Klasse können hier jederzeit geändert werden. Vorhandene Beobachtungen und Eigenschaften bleiben erhalten.
+    </div>
+    <div class="dialog-actions">
+      <button onclick="studentDialog.close()">Abbrechen</button>
+      <button class="primary" onclick="saveStudent()">Speichern</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="assignDialog">
+  <div class="info" style="margin:0;border:0">
+    <h2>Verhaltensbereiche</h2>
+    <div id="builder" class="builder"></div>
+    <div class="dialog-actions">
+      <button onclick="assignDialog.close()">Abbrechen</button>
+      <button class="primary" onclick="saveAssigned()">Übernehmen</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="obsDialog">
+  <div class="info" style="margin:0;border:0">
+    <h2 id="obsDialogTitle">Neue Beobachtung</h2>
+    <label for="obsDate">Datum</label>
+    <input id="obsDate" type="date">
+    <div class="notice" style="margin-top:15px">⭐ Die Ampel-Bewertung ist optional. Klicke auf 1–5 Sterne, wenn du eine Bewertung vergeben möchtest.</div>
+    <div id="obsRatings" style="margin-top:10px"></div>
+    <div class="obs-text" style="margin-top:15px">
+      <div>
+        <label for="obsIdeas">Beobachtungen</label>
+        <textarea id="obsIdeas" placeholder="Eigene Beobachtungen eintragen"></textarea>
+      </div>
+      <div>
+        <label for="obsSuggestions">Fördervorschläge</label>
+        <textarea id="obsSuggestions" placeholder="Fördervorschläge"></textarea>
+      </div>
+      <div style="grid-column:1/-1">
+        <label for="obsNotes">Notizen</label>
+        <textarea id="obsNotes"></textarea>
+      </div>
+    </div>
+    <div class="dialog-actions">
+      <button onclick="closeObservationDialog()">Abbrechen</button>
+      <button class="primary" onclick="saveObservation()">Speichern</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="hourDialog">
+  <div class="info" style="margin:0;border:0">
+    <h2 id="hourDialogTitle">Stunde hinzufügen</h2>
+    <div class="dialog-grid">
+      <div><label for="hourDate">Datum</label><input id="hourDate" type="date"></div>
+      <div><label for="hourClass">Klasse</label><input id="hourClass" placeholder="z. B. 5a"></div>
+      <div><label for="hourNumber">Stunde</label><input id="hourNumber" placeholder="z. B. 1 oder 1.–2."></div>
+      <div><label for="hourTopic">Thema</label><input id="hourTopic" placeholder="Thema der Stunde"></div>
+      <div style="grid-column:1/-1"><label for="hourGoal">Förderziel</label><input id="hourGoal" placeholder="Förderziel der Klasse"></div>
+      <div style="grid-column:1/-1"><label for="hourOther">Sonstiges</label><textarea id="hourOther" placeholder="Notizen, Informationen, Material …"></textarea></div>
+    </div>
+    <div class="dialog-actions">
+      <button onclick="hourDialog.close()">Abbrechen</button>
+      <button class="primary" onclick="saveHourEntry()">Speichern</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="classDialog">
+  <div class="info" style="margin:0;border:0">
+    <h2>Klassen verwalten</h2>
+    <div class="notice">Jede Klasse behält dauerhaft dieselbe Farbe. Das Förderziel wird pro Klasse gespeichert und automatisch verwendet.</div>
+    <div id="classList" class="class-list"></div>
+    <div class="dialog-actions">
+      <button onclick="classDialog.close()">Schließen</button>
+      <button onclick="addClassEntry()">＋ Klasse hinzufügen</button>
+      <button class="primary" onclick="saveClassSettings()">Speichern</button>
+    </div>
+  </div>
+</dialog>
+
+<input id="jsonInput" type="file" accept=".json,application/json" hidden>
+
+<script>
+"use strict";
+
+const KEY="schueler-dokumentation-v6";
+const OLD_KEYS=["schueler-dokumentation-v5","schueler-dokumentation-v4"];
+
+const SUPABASE_URL="https://simwmxgnqikcuczorvza.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_U352HTBrbq8jOAnaNtid-w_VlO7rYE3";
+let supabaseClient=null;
+let cloudUser=null;
+let cloudTimer=null;
+
+const DEFAULT_VERHALTENSBEREICHE={
+  "Unterrichtsverhalten":{color:"#000000",items:[
+    ["Aufmerksamkeit","#000000"],["Konzentration","#000000"],["Mitarbeit","#000000"],["Motivation","#000000"],["Anstrengungsbereitschaft","#000000"],["Selbstständigkeit","#000000"],["Sorgfalt","#000000"],["Arbeitsgeschwindigkeit","#000000"]
+  ]},
+  "Pausenverhalten":{color:"#000000",items:[
+    ["Kontaktaufnahme","#000000"],["Spielverhalten","#000000"],["Rücksichtnahme","#000000"],["Selbstständige Pausengestaltung","#000000"],["Einhaltung von Pausenregeln","#000000"]
+  ]},
+  "Konfliktverhalten":{color:"#000000",items:[
+    ["Konflikte wahrnehmen","#000000"],["Konflikte ansprechen","#000000"],["Lösungsbereitschaft","#000000"],["Umgang mit Kritik","#000000"],["Aggressives Verhalten","#000000"]
+  ]},
+  "Regeleinhaltung":{color:"#000000",items:[
+    ["Schulregeln einhalten","#000000"],["Absprachen einhalten","#000000"],["Grenzen akzeptieren","#000000"],["Auf Aufforderungen reagieren","#000000"]
+  ]},
+  "Unterrichtssprache":{color:"#000000",items:[
+    ["Angemessene Wortwahl","#000000"],["Lautstärke","#000000"],["Sprechbereitschaft","#000000"],["Zuhören und Ausreden lassen","#000000"],["Sachbezogenes Sprechen","#000000"]
+  ]}
+};
+let VERHALTENSBEREICHE={};
+
+const CLASS_COLORS=[
+  "#4C78A8","#E45756","#59A14F","#F28E2B","#B279A2","#76B7B2",
+  "#EDC948","#AF7AA1","#FF9DA7","#9C755F","#2F4B7C","#7A5195"
+];
+
+let state=loadState();
+let selectedId=null;
+let editingStudentId=null;
+let editingHourId=null;
+let editingObservationIndex=null;
+let pendingRatings={};
+
+function uid(){
+  return Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+}
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function normalizeClassName(v){return String(v||"").trim().toLocaleLowerCase("de-DE")}
+function setStatus(text,kind=""){
+  const e=document.getElementById("status");
+  e.textContent=text;e.className="status"+(kind?" "+kind:"");
+}
+function normalizeState(input){
+  const st=input&&typeof input==="object"?input:{};
+  if(!Array.isArray(st.students))st.students=[];
+  if(!Array.isArray(st.hours))st.hours=[];
+  if(!st.classColors||typeof st.classColors!=="object")st.classColors={};
+  if(!st.classGoals||typeof st.classGoals!=="object")st.classGoals={};
+  if(!st.verhaltensbereiche||typeof st.verhaltensbereiche!=="object")st.verhaltensbereiche={};
+  VERHALTENSBEREICHE=JSON.parse(JSON.stringify(DEFAULT_VERHALTENSBEREICHE));
+  Object.entries(st.verhaltensbereiche).forEach(([name,g])=>{
+    if(!g||typeof g!=="object")return;
+    VERHALTENSBEREICHE[name]={color:g.color||"#6B7280",items:Array.isArray(g.items)?g.items.map(it=>[String(it[0]||""),String(it[1]||"#9CA3AF")]).filter(it=>it[0]):[]};
+  });
+
+  st.students.forEach(s=>{
+    if(!s.id)s.id=uid();
+    s.name=String(s.name||"");
+    s.klasse=String(s.klasse||"");
+    if(!Array.isArray(s.assigned))s.assigned=[];
+    if(!Array.isArray(s.observations))s.observations=[];
+    if(s.klasse)classColor(s.klasse,st);
+    s.observations.forEach(o=>{
+      if(!o.id)o.id=uid();
+      if(!o.ratings||typeof o.ratings!=="object")o.ratings={};
+      o.date=String(o.date||"");
+      o.ideas=String(o.ideas||"");
+      o.suggestions=String(o.suggestions||"");
+      o.notes=String(o.notes||"");
+    });
+  });
+  st.hours.forEach(h=>{
+    if(!h.id)h.id=uid();
+    ["date","klasse","stunde","thema","foerderziel","sonstiges"].forEach(k=>h[k]=String(h[k]||""));
+    if(h.klasse)classColor(h.klasse,st);
+  });
+  return st;
+}
+function classColor(cls,st=state){
+  const key=normalizeClassName(cls);
+  if(!key)return "#cfd4da";
+  if(!st.classColors[key]){
+    const used=Object.values(st.classColors);
+    st.classColors[key]=CLASS_COLORS.find(c=>!used.includes(c))||
+      CLASS_COLORS[Object.keys(st.classColors).length%CLASS_COLORS.length];
+  }
+  return st.classColors[key];
+}
+function classBadge(cls){
+  if(!cls)return "";
+  const c=classColor(cls);
+  return `<span class="class-badge" style="background:${c}18;border:1px solid ${c};color:${c}">${esc(cls)}</span>`;
+}
+
+function loadState(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(raw)return normalizeState(JSON.parse(raw));
+    for(const oldKey of OLD_KEYS){
+      const old=localStorage.getItem(oldKey);
+      if(old)return normalizeState(JSON.parse(old));
+    }
+  }catch(e){console.warn(e)}
+  return normalizeState({students:[],hours:[],classColors:{},classGoals:{}});
+}
+
+function saveLocalOnly(){
+  state=normalizeState(state);
+  localStorage.setItem(KEY,JSON.stringify(state));
+  setStatus("Lokal gespeichert · "+new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}),"sync-ok");
+}
+async function saveAll(){
+  saveLocalOnly();
+  if(cloudUser)await saveCloud();
+}
+function scheduleCloudSave(){
+  if(!cloudUser)return;
+  clearTimeout(cloudTimer);
+  cloudTimer=setTimeout(()=>saveCloud(),500);
+}
+
+function persist(){
+  state=normalizeState(state);
+  localStorage.setItem(KEY,JSON.stringify(state));
+  scheduleCloudSave();
+  setStatus("Automatisch lokal gespeichert · "+new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}));
+}
+
+function showOverview(){
+  ["detail","hours"].forEach(id=>document.getElementById(id).classList.remove("active"));
+  document.getElementById("overview").classList.add("active");
+  selectedId=null;
+  renderStudents();
+}
+function showHoursOverview(){
+  ["overview","detail"].forEach(id=>document.getElementById(id).classList.remove("active"));
+  document.getElementById("hours").classList.add("active");
+  selectedId=null;renderHours();
+}
+
+
+function saveStudentInformationen(id, value){
+  const s=state.students.find(x=>String(x.id)===String(id));
+  if(!s) return;
+  s.informationen=value;
+  persist();
+}
+
+function renderStudents(){
+  const grid=document.getElementById("studentGrid");
+  grid.innerHTML="";
+  if(!state.students.length){
+    grid.innerHTML='<div class="empty" style="grid-column:1/-1"><b>Noch keine Schüler angelegt.</b><br><br>Klicke auf „＋ Schüler hinzufügen“.</div>';
+    return;
+  }
+  state.students.forEach(s=>{
+    const card=document.createElement("div");
+    card.className="student-card";
+    const c=s.klasse?classColor(s.klasse):"#cfd4da";
+    card.style.borderColor=c;
+    card.style.background=`linear-gradient(135deg,${c}12,#fff 55%)`;
+    card.innerHTML=`
+      <div class="student-name">${esc(s.name)}</div>
+      <div class="student-meta">${s.klasse?classBadge(s.klasse)+" · ":""}${s.observations.length} Beobachtung${s.observations.length===1?"":"en"}</div>
+      <div class="student-actions">
+        <button type="button" onclick="event.stopPropagation();openStudent(${JSON.stringify(s.id)})">Öffnen</button>
+        <button type="button" onclick="event.stopPropagation();editStudent(${JSON.stringify(s.id)})">Bearbeiten</button>
+        <button type="button" class="danger" onclick="event.stopPropagation();deleteStudent(${JSON.stringify(s.id)})">Löschen</button>
+      </div>`;
+    card.onclick=()=>openStudent(s.id);
+    grid.appendChild(card);
+  });
+}
+
+function openAddStudent(){
+  editingStudentId=null;
+  document.getElementById("studentDialogTitle").textContent="Schüler hinzufügen";
+  document.getElementById("studentName").value="";
+  document.getElementById("studentClass").value="";
+  document.getElementById("studentDialog").showModal();
+}
+function editStudent(id){
+  const s=state.students.find(x=>x.id===id);
+  if(!s){ alert("Schüler nicht gefunden."); return; }
+
+  editingStudentId=String(id);
+  document.getElementById("studentDialogTitle").textContent="Schüler bearbeiten";
+  const nameField=document.getElementById("studentName");
+  const classField=document.getElementById("studentClass");
+
+  nameField.value=s.name || "";
+  classField.value=s.klasse || "";
+  document.getElementById("studentInformationen").value=s.informationen || "";
+
+  document.getElementById("studentDialog").showModal();
+
+  // Sicherstellen, dass die Felder nach dem Öffnen wirklich editierbar sind.
+  setTimeout(()=>{
+    nameField.disabled=false;
+    nameField.readOnly=false;
+    classField.disabled=false;
+    classField.readOnly=false;
+    nameField.focus();
+  },50);
+}
+function saveStudent(){
+  const name=document.getElementById("studentName").value.trim();
+  const klasse=document.getElementById("studentClass").value.trim();
+  const informationen=document.getElementById("studentInformationen").value.trim();
+
+  if(!name){
+    alert("Bitte einen Namen eingeben.");
+    document.getElementById("studentName").focus();
+    return;
+  }
+
+  if(editingStudentId !== null){
+    const s=state.students.find(x=>String(x.id)===String(editingStudentId));
+    if(!s){
+      alert("Der Schüler konnte nicht gefunden werden.");
+      return;
+    }
+
+    const oldClass=s.klasse;
+    s.name=name;
+    s.klasse=klasse;
+    s.informationen=informationen;
+
+    // Die Eigenschaften/Verhaltensbereiche und bisherigen Beobachtungen
+    // bleiben beim Schüler erhalten.
+    if(klasse){
+      classColor(klasse);
+      if(!state.classGoals) state.classGoals={};
+    }
+
+    // Wenn der Schüler gerade geöffnet ist, Detailansicht aktualisieren.
+    if(String(selectedId)===String(s.id)){
+      document.getElementById("detailName").textContent=s.name;
+      document.getElementById("detailInfo").innerHTML=s.klasse?classBadge(s.klasse):"";
+    }
+
+  }else{
+    if(klasse)classColor(klasse);
+    state.students.push({
+      id:uid(),
+      name:name,
+      klasse:klasse,
+      assigned:[],
+      observations:[],
+      informationen:""
+    });
+  }
+
+  persist();
+  document.getElementById("studentDialog").close();
+  editingStudentId=null;
+  renderStudents();
+
+  if(selectedId) openStudent(selectedId);
+}
+function deleteStudent(id){
+  const s=state.students.find(x=>x.id===id);if(!s)return;
+  if(!confirm(`Soll „${s.name}“ wirklich gelöscht werden?\n\nDer Schüler und alle zugehörigen Beobachtungen werden gelöscht.`))return;
+  state.students=state.students.filter(x=>x.id!==id);
+  if(selectedId===id){selectedId=null;showOverview()}else renderStudents();
+  persist();
+}
+function deleteSelectedStudent(){if(selectedId)deleteStudent(selectedId)}
+
+function getStudent(){
+  const s=state.students.find(s=>String(s.id)===String(selectedId));
+  if(s && typeof s.informationen!=="string") s.informationen="";
+  return s;
+}
+function openStudent(id){
+  selectedId=id;const s=getStudent();if(!s)return;
+  document.getElementById("overview").classList.remove("active");
+  document.getElementById("hours").classList.remove("active");
+  document.getElementById("detail").classList.add("active");
+  document.getElementById("detailName").textContent=s.name;
+  document.getElementById("detailInfo").innerHTML=s.klasse?classBadge(s.klasse):"";
+  const db=document.getElementById("detailInformationen");
+  if(db) db.value=s.informationen || "";
+  renderAssigned();renderObservations();renderDevelopment();
+}
+
+function splitKey(key){
+  const i=key.indexOf("|");return i<0?{o:key,u:""}:{o:key.slice(0,i),u:key.slice(i+1)}
+}
+function renderAssigned(){
+  // Die Auswahl wird intern gespeichert, aber auf der Schülerseite nicht nochmals angezeigt.
+}
+function openAssign(){
+  const s=getStudent();if(!s)return;
+  const chosen=new Set(s.assigned||[]),b=document.getElementById("builder");b.innerHTML="";
+  Object.entries(VERHALTENSBEREICHE).forEach(([group,g])=>{
+    const box=document.createElement("div");box.className="box";
+    box.innerHTML=`<h4 style="color:#000;font-weight:700;background:#fff">${esc(group)}</h4><div class="checks">${g.items.map(([name,color])=>{
+      const key=group+"|"+name;
+      return `<label style="color:#000;font-weight:400;background:#fff"><input type="checkbox" value="${esc(key)}" ${chosen.has(key)?"checked":""}>${esc(name)}</label>`
+    }).join("") || '<span class="sub">Noch keine Unterbereiche.</span>'}</div>`;
+    b.appendChild(box);
+  });
+  const controls=document.createElement("div");controls.className="info";controls.style.marginTop="12px";
+  controls.innerHTML=`<h4>Eigene Bereiche und Unterbereiche</h4>
+    <div class="sub">Du kannst eigene Oberbereiche anlegen und darunter beliebig viele Unterbereiche ergänzen.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+      <input id="newBehaviorGroup" placeholder="Neuer Oberbereich" style="flex:1;min-width:220px">
+      <button type="button" onclick="addBehaviorGroup()">＋ Oberbereich</button>
+    </div>
+    <div id="customBehaviorEditor" style="margin-top:10px"></div>`;
+  b.appendChild(controls);
+  renderCustomBehaviorEditor();
+  document.getElementById("assignDialog").showModal();
+}
+function addBehaviorGroup(){
+  const input=document.getElementById("newBehaviorGroup"),name=(input?.value||"").trim();
+  if(!name)return;
+  if(VERHALTENSBEREICHE[name]){alert("Dieser Oberbereich existiert bereits.");return}
+  VERHALTENSBEREICHE[name]={color:"#6B7280",items:[]};
+  state.verhaltensbereiche[name]={color:"#6B7280",items:[]};
+  input.value="";persist();openAssign();
+}
+function addBehaviorItem(group){
+  const input=document.getElementById("newItem_"+encodeURIComponent(group));
+  const name=(input?.value||"").trim();if(!name)return;
+  if(VERHALTENSBEREICHE[group].items.some(x=>x[0].toLowerCase()===name.toLowerCase())){alert("Dieser Unterbereich existiert bereits.");return}
+  VERHALTENSBEREICHE[group].items.push([name,"#9CA3AF"]);
+  state.verhaltensbereiche[group]=VERHALTENSBEREICHE[group];
+  input.value="";persist();openAssign();
+}
+function renderCustomBehaviorEditor(){
+  const target=document.getElementById("customBehaviorEditor");if(!target)return;
+  const defaults=new Set(Object.keys(DEFAULT_VERHALTENSBEREICHE));
+  target.innerHTML=Object.keys(VERHALTENSBEREICHE).map(group=>{
+    const custom=!defaults.has(group);
+    const items=VERHALTENSBEREICHE[group].items||[];
+    return `<div style="border:1px solid #d9dee5;border-radius:10px;padding:10px;margin-top:8px">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b>${esc(group)}</b>${custom?`<button type="button" class="danger" onclick="removeBehaviorGroup('${esc(group)}')">Oberbereich löschen</button>`:""}</div>
+      <div style="margin-top:7px">${items.map(([name])=>`<span class="chip" style="margin:2px;display:inline-flex;align-items:center;gap:5px">${esc(name)}<button type="button" style="border:0;background:none;padding:0;cursor:pointer" title="Unterbereich entfernen" onclick="removeBehaviorItem('${esc(group)}','${esc(name)}')">×</button></span>`).join("")||'<span class="sub">Keine Unterbereiche</span>'}</div>
+      <div style="display:flex;gap:8px;margin-top:8px"><input id="newItem_${encodeURIComponent(group)}" placeholder="Neuer Unterbereich" style="flex:1"><button type="button" onclick="addBehaviorItem('${esc(group)}')">＋ Unterbereich</button></div>
+    </div>`;
+  }).join("");
+}
+function removeBehaviorItem(group,name){
+  if(!VERHALTENSBEREICHE[group])return;
+  if(!confirm(`Unterbereich „${name}“ wirklich entfernen?`))return;
+  VERHALTENSBEREICHE[group].items=VERHALTENSBEREICHE[group].items.filter(x=>x[0]!==name);
+  state.verhaltensbereiche[group]=VERHALTENSBEREICHE[group];
+  const s=getStudent();if(s)s.assigned=(s.assigned||[]).filter(k=>k!==(group+"|"+name));
+  persist();openAssign();
+}
+function removeBehaviorGroup(group){
+  if(!confirm(`Oberbereich „${group}“ wirklich löschen?`))return;
+  delete VERHALTENSBEREICHE[group];
+  if(state.verhaltensbereiche)delete state.verhaltensbereiche[group];
+  const s=getStudent();if(s)s.assigned=(s.assigned||[]).filter(k=>!k.startsWith(group+"|"));
+  persist();openAssign();
+}
+function saveAssigned(){
+  const s=getStudent();if(!s)return;
+  s.assigned=[...document.querySelectorAll("#builder input[type=checkbox]:checked")].map(x=>x.value);
+  persist();document.getElementById("assignDialog").close();renderAssigned();
+}
+
+function normalizeAmpelRating(v){
+  v=Number(v)||0;
+  if(v<=0)return 0;
+  // Bestehende Bewertungen bleiben numerisch erhalten:
+  // 1 = rot, 2/3 = orange, 4 = gelb, 5 = grün.
+  return Math.max(1,Math.min(5,Math.round(v)));
+}
+
+function ampelLabel(v){
+  return ({1:"Rot",2:"Orange",3:"Gelb",4:"Gelb",5:"Grün"})[Number(v)]||"";
+}
+
+function ampelClass(v){
+  v=normalizeAmpelRating(v);
+  if(v===5)return "green";
+  if(v===4)return "yellow";
+  if(v===2 || v===3)return "orange";
+  if(v===1)return "red";
+  return "";
+}
+
+
+function getDevelopmentRatingClass(v){
+  v=Number(v)||0;
+  if(v>=5)return "dev-green";
+  if(v>=4)return "dev-yellow";
+  if(v>=2)return "dev-orange";
+  if(v>=1)return "dev-red";
+  return "";
+}
+
+function getRatingColor(v){
+  v=normalizeAmpelRating(v);
+  if(v===5)return "#22c55e";
+  if(v===4)return "#facc15";
+  if(v===2 || v===3)return "#f97316";
+  if(v===1)return "#ef4444";
+  return "#cbd5e1";
+}
+
+function trafficLights(key){
+  const v=normalizeAmpelRating(pendingRatings[key]||0);
+  const color=getRatingColor(v);
+
+  // Immer genau fünf Sterne. Bei Auswahl werden die ausgewählten Sterne
+  // gemeinsam in der Farbe der gewählten Bewertungsstufe dargestellt.
+  const stars=[1,2,3,4,5].map(n=>{
+    const active=n<=v;
+    return `<button
+      type="button"
+      class="rating-star ${active?"selected":""}"
+      data-rating-value="${n}"
+      data-rating-key="${esc(key)}"
+      onclick="rateTraffic(this)"
+      aria-label="${n} von 5 Sterne"
+      style="color:${active?color:"#cbd5e1"} !important;">${active?"★":"☆"}</button>`;
+  }).join("");
+
+  const clear=v
+    ? `<button class="clear-rating" type="button" onclick="clearTrafficRating(this)" aria-label="Bewertung löschen">×</button>`
+    : "";
+
+  return `<span class="traffic-buttons five-stars" data-rating-key="${esc(key)}">${stars}</span>${clear}`;
+}
+
+function rateTraffic(button){
+  const key=button.getAttribute("data-rating-key") || button.closest(".traffic-buttons")?.getAttribute("data-rating-key");
+  if(!key)return;
+  setRating(key,button.getAttribute("data-rating-value"));
+}
+
+function setRating(key,v){
+  v=Number(v)||0;
+  if(v<=0) delete pendingRatings[key];
+  else pendingRatings[key]=Math.max(1,Math.min(5,v));
+
+  document.querySelectorAll(".traffic-buttons.five-stars").forEach(wrap=>{
+    if(wrap.getAttribute("data-rating-key")===key){
+      const holder=wrap.parentElement;
+      const fresh=trafficLights(key);
+      const clear=holder.querySelector(".clear-rating");
+      holder.innerHTML=fresh;
+    }
+  });
+}
+
+function buildObservationRatings(s, existingRatings={}){
+  const keys=[...new Set([...(s.assigned||[]),...Object.keys(existingRatings||{})])];
+  if(!keys.length){
+    return "<div class='sub'>Keine Verhaltensbereiche ausgewählt. Du kannst trotzdem eine freie Beobachtung eintragen.</div>";
+  }
+  return "<div class='ratings'>"+keys.map(key=>{
+    const x=splitKey(key);
+    return `<div class="rating-row">
+      <div><b>${esc(x.o)}</b> → ${esc(x.u)}</div>
+      <div class="stars">${trafficLights(key)}</div>
+    </div>`;
+  }).join("")+"</div>";
+}
+
+function addObservation(){
+  const s=getStudent();if(!s)return;
+  editingObservationIndex=null;
+  pendingRatings={};
+  document.getElementById("obsDialogTitle").textContent="Neue Beobachtung";
+  document.getElementById("obsDate").value=new Date().toISOString().slice(0,10);
+  document.getElementById("obsIdeas").value="";
+  document.getElementById("obsSuggestions").value="";
+  document.getElementById("obsNotes").value="";
+  document.getElementById("obsRatings").innerHTML=buildObservationRatings(s,{});
+  document.getElementById("obsDialog").showModal();
+}
+
+function editObservation(index){
+  const s=getStudent();if(!s)return;
+  const o=s.observations?.[index];
+  if(!o){alert("Die Beobachtung konnte nicht gefunden werden.");return;}
+
+  editingObservationIndex=index;
+  pendingRatings=Object.fromEntries(
+    Object.entries(o.ratings||{})
+      .map(([k,v])=>[k,normalizeAmpelRating(v)])
+      .filter(([_,v])=>v>0)
+  );
+
+  document.getElementById("obsDialogTitle").textContent="Beobachtung bearbeiten";
+  document.getElementById("obsDate").value=o.date||"";
+  document.getElementById("obsIdeas").value=o.ideas||"";
+  document.getElementById("obsSuggestions").value=o.suggestions||"";
+  document.getElementById("obsNotes").value=o.notes||"";
+  document.getElementById("obsRatings").innerHTML=buildObservationRatings(s,o.ratings||{});
+  document.getElementById("obsDialog").showModal();
+}
+
+function closeObservationDialog(){
+  document.getElementById("obsDialog").close();
+  editingObservationIndex=null;
+  pendingRatings={};
+}
+
+function saveObservation(){
+  const s=getStudent();if(!s)return;
+
+  const data={
+    date:document.getElementById("obsDate").value,
+    ratings:Object.fromEntries(
+      Object.entries(pendingRatings)
+        .map(([k,v])=>[k,normalizeAmpelRating(v)])
+        .filter(([_,v])=>v>0)
+    ),
+    ideas:document.getElementById("obsIdeas").value,
+    suggestions:document.getElementById("obsSuggestions").value,
+    notes:document.getElementById("obsNotes").value
+  };
+
+  if(editingObservationIndex!==null){
+    const old=s.observations?.[editingObservationIndex];
+    if(!old){alert("Die Beobachtung konnte nicht gefunden werden.");return;}
+    s.observations[editingObservationIndex]={
+      ...old,
+      ...data
+    };
+  }else{
+    s.observations.push({
+      id:uid(),
+      ...data
+    });
+  }
+
+  persist();
+  document.getElementById("obsDialog").close();
+  editingObservationIndex=null;
+  pendingRatings={};
+  renderObservations();
+  renderDevelopment();
+}
+
+function formatText(v){return esc(v).replace(/\n/g,"<br>")}
+
+function deleteObservation(index){
+  const s=getStudent();if(!s)return;
+  if(!confirm("Diese Beobachtung wirklich löschen?"))return;
+  s.observations.splice(index,1);
+  persist();
+  renderObservations();
+  renderDevelopment();
+}
+
+function renderObservations(){
+  const s=getStudent(),target=document.getElementById("observations");if(!s)return;
+  target.innerHTML="";
+  if(!s.observations.length){
+    target.innerHTML='<div class="empty">Noch keine Beobachtungen vorhanden.</div>';
+    return;
+  }
+
+  [...s.observations].reverse().forEach((o,ri)=>{
+    const real=s.observations.length-1-ri;
+    const div=document.createElement("div");
+    div.className="observation";
+
+    const ratingEntries=Object.entries(o.ratings||{}).filter(([_,v])=>Number(v)>0);
+    const rows=ratingEntries.map(([key,v])=>{
+      const x=splitKey(key);
+      const groupColor=getBehaviorGroupColor(x.o);
+      return `<div class="rating-row">
+        <div><b style="color:${groupColor}">${esc(x.o)}</b> → ${esc(x.u)}</div>
+        <div class="traffic-display">
+          ${(() => {
+            const rv=normalizeAmpelRating(v);
+            let c=rv>=5?"green":(rv>=3?"yellow":(rv===2?"orange":"red"));
+            return `<span class="saved-five-stars">${[1,2,3,4,5].map(n=>`<span style="color:${n<=rv?getRatingColor(rv):"#cbd5e1"} !important">${n<=rv?"★":"☆"}</span>`).join("")}</span>`;
+          })()}
+        </div>
+      </div>`;
+    }).join("");
+
+    const noRating=ratingEntries.length
+      ? ""
+      : `<div class="sub">Keine Ampel-Bewertung abgegeben.</div>`;
+
+    div.innerHTML=`
+      <div class="obs-top">
+        <div class="obs-date">${o.date?new Date(o.date+"T12:00:00").toLocaleDateString("de-DE"):"Ohne Datum"}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button type="button" onclick="editObservation(${real})">Bearbeiten</button>
+          <button type="button" class="danger" onclick="deleteObservation(${real})">Löschen</button>
+        </div>
+      </div>
+      <div class="ratings">${rows}${noRating}</div>
+      <div class="obs-text">
+        <div><label>Beobachtungen</label><div>${formatText(o.ideas)||"—"}</div></div>
+        <div><label>Fördervorschläge</label><div>${formatText(o.suggestions)||"—"}</div></div>
+        <div style="grid-column:1/-1"><label>Notizen</label><div>${formatText(o.notes)||"—"}</div></div>
+      </div>`;
+    target.appendChild(div);
+  });
+}
+
+function getBehaviorGroupColor(group){
+  const colors=[
+    "#2563eb","#dc2626","#16a34a","#9333ea","#ea580c",
+    "#0891b2","#db2777","#65a30d","#7c3aed","#ca8a04",
+    "#475569","#0f766e"
+  ];
+  const groups=Object.keys(VERHALTENSBEREICHE||{});
+  const idx=groups.indexOf(group);
+  return colors[(idx<0?0:idx)%colors.length];
+}
+
+function renderDevelopment(){
+  const s=getStudent(),target=document.getElementById("development");if(!s)return;
+  const obs=s.observations||[];
+  if(!obs.length){
+    target.innerHTML='<div class="empty">Sobald Beobachtungen vorhanden sind, erscheint hier das Entwicklungsdiagramm.</div>';
+    return;
+  }
+
+  // Im Entwicklungsdiagramm werden die eigentlichen Oberbereiche dargestellt.
+  // Für jeden Termin wird der Durchschnitt der an diesem Termin bewerteten
+  // Unterbereiche eines Oberbereichs berechnet. Nicht bewertete Unterbereiche
+  // werden dabei nicht als 0 gewertet.
+  const groups=Object.keys(VERHALTENSBEREICHE||{}).filter(group=>{
+    return obs.some(o=>Object.keys(o.ratings||{}).some(key=>splitKey(key).o===group && Number(o.ratings[key])>0));
+  });
+
+  if(!groups.length){
+    target.innerHTML='<div class="empty">Es gibt noch keine Ampel-Bewertungen für die Verhaltensbereiche. Sobald Bewertungen vorhanden sind, werden hier die Entwicklungstrends der Oberbereiche angezeigt.</div>';
+    return;
+  }
+
+  const chartColors=[
+    "#2563eb","#dc2626","#16a34a","#9333ea","#ea580c",
+    "#0891b2","#db2777","#65a30d","#7c3aed","#ca8a04",
+    "#475569","#0f766e"
+  ];
+  const W=Math.max(620,(obs.length-1)*110+80),H=300;
+  const xp=i=>obs.length===1?50:(i/(obs.length-1))*100;
+  const bp=v=>((v-1)/4)*100;
+
+  let grid="";
+  for(let v=1;v<=5;v++){
+    const b=bp(v);
+    grid+=`<div class="gridline" style="bottom:${b}%"></div><div class="ylabel" style="bottom:${Math.max(0,b-2)}%">${v}</div>`;
+  }
+
+  const labels=obs.map((o,i)=>`<div style="position:absolute;left:${xp(i)}%;bottom:-30px;transform:translateX(-50%);font-size:11px;color:#69717b;white-space:nowrap">${o.date?new Date(o.date+"T12:00:00").toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"}):"Termin "+(i+1)}</div>`).join("");
+
+  let lines="",legend="",summary="";
+
+  groups.forEach((group,gi)=>{
+    const color=chartColors[gi%chartColors.length];
+    const groupItems=(VERHALTENSBEREICHE[group]?.items||[]).map(x=>x[0]);
+    const points=obs.map((o,i)=>{
+      const values=groupItems.map(u=>Number(o.ratings?.[`${group}|${u}`]||0)).filter(v=>v>0);
+      if(!values.length)return null;
+      return {i,v:values.reduce((a,b)=>a+b,0)/values.length,n:values.length};
+    });
+
+    let seg="";
+    const valid=points.filter(Boolean);
+    for(let j=1;j<valid.length;j++){
+      const a=valid[j-1],b=valid[j];
+      const x1=xp(a.i),x2=xp(b.i),y1=100-bp(a.v),y2=100-bp(b.v);
+      const dx=(x2-x1)*W/100,dy=(y2-y1)*H/100;
+      const len=Math.sqrt(dx*dx+dy*dy),ang=Math.atan2(dy,dx)*180/Math.PI;
+      seg+=`<div class="chart-segment" style="background:${color};height:3px;left:${x1}%;top:${y1}%;width:${len}px;transform:rotate(${ang}deg)"></div>`;
+    }
+
+    const pts=points.map(p=>{
+      if(!p)return "";
+      const rounded=Math.round(p.v*10)/10;
+      return `<div class="chart-point" title="${esc(group)}: ${rounded.toLocaleString("de-DE",{minimumFractionDigits:1,maximumFractionDigits:1})}/5" style="border-color:${color};left:${xp(p.i)}%;bottom:${bp(p.v)}%"></div>`;
+    }).join("");
+
+    lines+=seg+pts;
+
+    const first=valid[0]?.v,last=valid[valid.length-1]?.v;
+    let trend="—",trendClass="neutral";
+    if(valid.length>=2){
+      const diff=last-first;
+      if(diff>0.15){trend="↑ +"+diff.toFixed(1).replace('.',',');trendClass="up";}
+      else if(diff<-0.15){trend="↓ "+diff.toFixed(1).replace('.',',');trendClass="down";}
+      else {trend="→ 0,0";trendClass="neutral";}
+    }
+    const latest=last==null?"—":last.toFixed(1).replace('.',',');
+    summary+=`<div class="development-summary-row">
+      <span class="legend-dot" style="background:${color}"></span>
+      <strong>${esc(group)}</strong>
+      <span class="development-latest">aktuell: ${latest}/4</span>
+      <span class="development-trend ${trendClass}">${trend}</span>
+    </div>`;
+    legend+=`<div class="legend-item"><span class="legend-dot" style="background:${color}"></span>${esc(group)}</div>`;
+  });
+
+  target.innerHTML=`
+    <div class="chart-wrap">
+      <div style="font-size:16px;font-weight:700">Entwicklung der Verhaltensbereiche</div>
+      <div class="sub" style="margin:4px 0 12px">Jede Linie zeigt den Entwicklungstrend eines Oberbereichs. Pro Termin wird der Durchschnitt der bewerteten Unterbereiche dieses Oberbereichs dargestellt.</div>
+      <div class="chart-scroll"><div style="position:relative;width:${W+190}px">
+        <div class="chart-area" style="width:${W}px;height:${H}px">${grid}${lines}${labels}</div>
+        <div class="chart-legend">${legend}</div>
+      </div></div>
+      <div class="development-summary" style="margin-top:18px">
+        <div style="font-weight:700;margin-bottom:8px">Aktueller Stand und Trend</div>
+        ${summary}
+      </div>
+      <div class="sub" style="margin-top:10px">🔴 1 Stern = hoher Unterstützungsbedarf · 🟠 2 Sterne = Unterstützungsbedarf · 🟡 3 Sterne = Unterstützungsbedarf · 4 Sterne = teilweise sicher · 🟢 5 Sterne = sicher. Nicht bewertete Unterbereiche werden nicht als 0 gewertet.</div>
+    </div>`;
+}
+
+function getClassGoal(cls){return state.classGoals?.[normalizeClassName(cls)]||""}
+function getClasses(){
+  const map=new Map();
+  state.students.forEach(s=>{if(s.klasse){const k=normalizeClassName(s.klasse);map.set(k,{name:s.klasse,color:classColor(s.klasse),goal:getClassGoal(s.klasse)})}});
+  state.hours.forEach(h=>{if(h.klasse){const k=normalizeClassName(h.klasse);if(!map.has(k))map.set(k,{name:h.klasse,color:classColor(h.klasse),goal:h.foerderziel||getClassGoal(h.klasse)});}});
+  Object.entries(state.classGoals).forEach(([k,goal])=>{if(map.has(k))map.get(k).goal=goal});
+  return [...map.values()].sort((a,b)=>a.name.localeCompare(b.name,"de"));
+}
+function openClassManager(){
+  const list=document.getElementById("classList");list.innerHTML="";
+  const classes=getClasses();
+  if(!classes.length)list.innerHTML='<div class="empty">Noch keine Klassen vorhanden.</div>';
+  classes.forEach(x=>list.appendChild(createClassEditor(x.name,x.color,x.goal)));
+  document.getElementById("classDialog").showModal();
+}
+function createClassEditor(name,color,goal){
+  const row=document.createElement("div");row.className="class-row-editor";row.dataset.original=normalizeClassName(name);
+  row.innerHTML=`<input type="text" value="${esc(name)}" aria-label="Klasse">
+    <input type="color" class="color-input" value="${color}" aria-label="Farbe">
+    <input type="text" value="${esc(goal)}" placeholder="Förderziel" aria-label="Förderziel">
+    <button type="button" class="danger" onclick="this.parentElement.remove()">Entfernen</button>`;
+  return row;
+}
+function addClassEntry(){
+  const list=document.getElementById("classList");
+  if(list.querySelector(".empty"))list.innerHTML="";
+  const row=createClassEditor("",CLASS_COLORS[Object.keys(state.classColors).length%CLASS_COLORS.length],"");
+  list.appendChild(row);row.querySelector("input[type=text]").focus();
+}
+function saveClassSettings(){
+  if(!state.classGoals)state.classGoals={};
+  document.querySelectorAll("#classList .class-row-editor").forEach(row=>{
+    const inputs=row.querySelectorAll("input"),name=inputs[0].value.trim(),color=inputs[1].value,goal=inputs[2].value.trim(),original=row.dataset.original;
+    if(!name)return;
+    const key=normalizeClassName(name);
+    state.classColors[key]=color;state.classGoals[key]=goal;
+    if(original&&original!==key){delete state.classColors[original];delete state.classGoals[original]}
+  });
+  state.hours.forEach(h=>{if(h.klasse)h.foerderziel=getClassGoal(h.klasse)||h.foerderziel});
+  persist();document.getElementById("classDialog").close();renderStudents();renderHours();
+}
+
+function renderHours(){
+  const rows=[...(state.hours||[])].sort((a,b)=>String(b.date).localeCompare(String(a.date))||String(a.stunde).localeCompare(String(b.stunde)));
+  const body=document.getElementById("hoursBody");body.innerHTML="";
+  document.getElementById("hoursEmpty").style.display=rows.length?"none":"block";
+  rows.forEach(h=>{
+    const tr=document.createElement("tr"),c=h.klasse?classColor(h.klasse):"#ddd";tr.style.borderLeftColor=c;
+    const goal=getClassGoal(h.klasse)||h.foerderziel||"";
+    tr.innerHTML=`<td>${h.date?new Date(h.date+"T12:00:00").toLocaleDateString("de-DE"):""}</td>
+      <td>${classBadge(h.klasse)}</td><td>${esc(h.stunde)}</td><td>${esc(h.thema)}</td>
+      <td>${formatText(goal)}</td><td>${formatText(h.sonstiges)}</td>
+      <td class="small-actions"><button onclick="editHourEntry(${JSON.stringify(h.id)})">Bearbeiten</button>
+      <button class="danger" onclick="deleteHourEntry(${JSON.stringify(h.id)})">Löschen</button></td>`;
+    body.appendChild(tr);
+  });
+}
+function addHourEntry(){
+  editingHourId=null;document.getElementById("hourDialogTitle").textContent="Stunde hinzufügen";
+  ["hourClass","hourNumber","hourTopic","hourGoal","hourOther"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("hourDate").value=new Date().toISOString().slice(0,10);
+  document.getElementById("hourDialog").showModal();
+}
+function editHourEntry(id){
+  const h=state.hours.find(x=>x.id===id);if(!h)return;
+  editingHourId=id;document.getElementById("hourDialogTitle").textContent="Stunde bearbeiten";
+  document.getElementById("hourDate").value=h.date;document.getElementById("hourClass").value=h.klasse;
+  document.getElementById("hourNumber").value=h.stunde;document.getElementById("hourTopic").value=h.thema;
+  document.getElementById("hourGoal").value=getClassGoal(h.klasse)||h.foerderziel;
+  document.getElementById("hourOther").value=h.sonstiges;document.getElementById("hourDialog").showModal();
+}
+function saveHourEntry(){
+  const data={
+    id:editingHourId||uid(),
+    date:document.getElementById("hourDate").value,
+    klasse:document.getElementById("hourClass").value.trim(),
+    stunde:document.getElementById("hourNumber").value.trim(),
+    thema:document.getElementById("hourTopic").value.trim(),
+    foerderziel:document.getElementById("hourGoal").value.trim(),
+    sonstiges:document.getElementById("hourOther").value
+  };
+  if(data.klasse){
+    classColor(data.klasse);
+    if(data.foerderziel){if(!state.classGoals)state.classGoals={};state.classGoals[normalizeClassName(data.klasse)]=data.foerderziel}
+  }
+  if(!data.date&&!data.klasse&&!data.stunde&&!data.thema&&!data.foerderziel&&!data.sonstiges.trim()){alert("Bitte mindestens ein Feld ausfüllen.");return}
+  const i=state.hours.findIndex(h=>h.id===editingHourId);
+  if(i>=0)state.hours[i]=data;else state.hours.push(data);
+  persist();document.getElementById("hourDialog").close();renderHours();
+}
+function deleteHourEntry(id){
+  if(!confirm("Diesen Stundeneintrag wirklich löschen?"))return;
+  state.hours=state.hours.filter(h=>h.id!==id);persist();renderHours();
+}
+
+function simpleHash(raw){
+  let h=2166136261;for(let i=0;i<raw.length;i++){h^=raw.charCodeAt(i);h=Math.imul(h,16777619)}return(h>>>0).toString(36)
+}
+function observationKey(o){return "obs-"+simpleHash(JSON.stringify([o.date,o.ratings,o.ideas,o.suggestions,o.notes]))}
+function hourKey(h){return "hour-"+simpleHash(JSON.stringify([h.date,h.klasse,h.stunde,h.thema,h.foerderziel,h.sonstiges]))}
+function studentKey(s){return normalizeClassName(s.name)+"|"+normalizeClassName(s.klasse)}
+
+function mergeStates(base,incoming){
+  base=normalizeState(base);incoming=normalizeState(incoming);
+  base.classColors={...base.classColors,...incoming.classColors};
+  base.classGoals={...base.classGoals,...incoming.classGoals};
+
+  const hours=new Map(base.hours.map(h=>[h.id||hourKey(h),h]));
+  incoming.hours.forEach(h=>{const k=h.id||hourKey(h);if(!hours.has(k))hours.set(k,{...h,id:k})});
+  base.hours=[...hours.values()];
+
+  incoming.students.forEach(src=>{
+    let target=base.students.find(s=>s.id===src.id)||base.students.find(s=>studentKey(s)===studentKey(src));
+    if(!target){base.students.push(JSON.parse(JSON.stringify(src)));return}
+    target.assigned=[...new Set([...(target.assigned||[]),...(src.assigned||[])])];
+    const obs=new Map((target.observations||[]).map(o=>[o.id||observationKey(o),o]));
+    (src.observations||[]).forEach(o=>{const k=o.id||observationKey(o);if(!obs.has(k))obs.set(k,{...o,id:k})});
+    target.observations=[...obs.values()];
+  });
+  return normalizeState(base);
+}
+
+function exportJSON(){
+  const data=JSON.stringify(normalizeState(state),null,2);
+  const a=document.createElement("a"),url=URL.createObjectURL(new Blob([data],{type:"application/json"}));
+  a.href=url;a.download="schueler-dokumentation-backup.json";document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  setStatus("JSON-Backup erstellt","sync-ok");
+}
+function openJSON(){document.getElementById("jsonInput").click()}
+document.getElementById("jsonInput").addEventListener("change",async e=>{
+  const file=e.target.files[0];if(!file)return;
+  try{
+    const imported=normalizeState(JSON.parse(await file.text()));
+    if(!confirm("JSON-Datei öffnen und die aktuellen lokalen Daten ersetzen?"))return;
+    state=imported;saveLocalOnly();showOverview();renderHours();
+  }catch(err){alert("Ungültige JSON-Datei.\n\n"+err.message)}
+  e.target.value="";
+});
+
+function openCloudLogin(){
+  if(!supabaseClient){alert("Die Cloud-Bibliothek konnte nicht geladen werden. Die lokale Speicherung funktioniert trotzdem.");return}
+  if(cloudUser){
+    if(confirm("Cloud-Konto abmelden? Die lokalen Daten bleiben erhalten.")){
+      supabaseClient.auth.signOut().then(()=>{cloudUser=null;document.getElementById("cloudUser").textContent="";setStatus("Cloud abgemeldet")})
+    }
+    return;
+  }
+  document.getElementById("cloudLogin").classList.remove("hidden");
+}
+function closeCloudLogin(){document.getElementById("cloudLogin").classList.add("hidden")}
+function cloudMsg(text,error=false){
+  const e=document.getElementById("cloudMsg");e.textContent=text;e.style.display="block";e.style.color=error?"#a33":"#2f6f44"
+}
+async function cloudSignUp(){
+  const email=document.getElementById("cloudEmail").value.trim(),password=document.getElementById("cloudPassword").value;
+  if(!email||password.length<6){cloudMsg("Bitte E-Mail und ein Passwort mit mindestens 6 Zeichen eingeben.",true);return}
+  const {error}=await supabaseClient.auth.signUp({email,password});
+  if(error)cloudMsg(error.message,true);else cloudMsg("Konto angelegt. Falls eine Bestätigungs-E-Mail kommt, bitte bestätigen und danach anmelden.");
+}
+async function cloudSignIn(){
+  const email=document.getElementById("cloudEmail").value.trim(),password=document.getElementById("cloudPassword").value;
+  if(!email||!password){cloudMsg("Bitte E-Mail und Passwort eingeben.",true);return}
+  const {data,error}=await supabaseClient.auth.signInWithPassword({email,password});
+  if(error){cloudMsg(error.message,true);return}
+  cloudUser=data.user;document.getElementById("cloudUser").textContent="☁️ "+(cloudUser.email||"angemeldet");
+  closeCloudLogin();await loadCloud();
+}
+async function loadCloud(){
+  if(!cloudUser)return;
+  setStatus("Cloud-Daten werden geladen …");
+  const {data,error}=await supabaseClient.from("app_data").select("data").eq("user_id",cloudUser.id).maybeSingle();
+  if(error){console.error(error);setStatus("Cloud-Laden fehlgeschlagen","sync-warn");alert("Cloud-Laden fehlgeschlagen. Prüfe in Supabase die Tabelle app_data und die RLS-Regeln.");return}
+  if(data?.data){
+    state=normalizeState(data.data);localStorage.setItem(KEY,JSON.stringify(state));
+    renderStudents();renderHours();setStatus("Cloud-Daten geladen","sync-ok");
+  }else{
+    await saveCloud();setStatus("Cloud-Speicher vorbereitet","sync-ok");
+  }
+}
+async function saveCloud(){
+  if(!cloudUser)return;
+  const payload={user_id:cloudUser.id,data:normalizeState(state)};
+  const {error}=await supabaseClient.from("app_data").upsert(payload,{onConflict:"user_id"});
+  if(error){console.error(error);setStatus("Cloud-Speichern fehlgeschlagen","sync-warn");return}
+  setStatus("Cloud gespeichert · "+new Date().toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"}),"sync-ok");
+}
+
+function saveDetailInformationen(){
+  const s=getStudent();
+  const el=document.getElementById("detailInformationen");
+  if(!s || !el) return;
+  s.informationen=el.value;
+  persist();
+}
+
+function printStudent(){
+  const s=getStudent();if(!s)return;
+  const rows=s.observations.map(o=>`<section style="border:1px solid #ddd;border-radius:8px;padding:14px;margin:12px 0;break-inside:avoid">
+    <h3>${o.date?new Date(o.date+"T12:00:00").toLocaleDateString("de-DE"):"Ohne Datum"}</h3>
+    ${Object.entries(o.ratings||{}).map(([k,v])=>{const x=splitKey(k);return `<div><b>${esc(x.o)} → ${esc(x.u)}</b>: ${"★".repeat(v)}${"☆".repeat(5-v)}</div>`}).join("")}
+    <p><b>Beobachtungen:</b><br>${formatText(o.ideas)||"—"}</p>
+    <p><b>Fördervorschläge:</b><br>${formatText(o.suggestions)||"—"}</p>
+    <p><b>Notizen:</b><br>${formatText(o.notes)||"—"}</p>
+  </section>`).join("");
+  const w=window.open("","_blank");if(!w){alert("Bitte Pop-ups für diese Seite erlauben.");return}
+  w.document.write(`<!doctype html><html lang="de"><head><meta charset="utf-8"><title>Beobachtungsübersicht</title><style>body{font-family:Arial,sans-serif;margin:30px;color:#222}</style></head><body><h1>Beobachtungsübersicht</h1><p><b>Schüler:</b> ${esc(s.name)}${s.klasse?" · Klasse "+esc(s.klasse):""}</p>${rows||"<p>Keine Beobachtungen vorhanden.</p>"}</body></html>`);
+  w.document.close();w.focus();setTimeout(()=>w.print(),300);
+}
+
+async function initCloud(){
+  try{
+    const script=document.createElement("script");
+    script.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+    script.onload=async()=>{
+      supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+      const {data:{session}}=await supabaseClient.auth.getSession();
+      if(session){cloudUser=session.user;document.getElementById("cloudUser").textContent="☁️ "+(cloudUser.email||"angemeldet");await loadCloud()}
+    };
+    script.onerror=()=>setStatus("Lokalbetrieb – Cloud-Bibliothek nicht geladen","sync-warn");
+    document.head.appendChild(script);
+  }catch(e){console.warn(e)}
+}
+
+renderStudents();
+renderHours();
+saveLocalOnly();
+initCloud();
+</script>
+</body>
+</html>
